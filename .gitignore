@@ -1,0 +1,23 @@
+# Astro
+node_modules/
+dist/
+.astro/
+
+# 초안 — check 를 거치지 않은 원고는 커밋하지 않는다
+drafts/
+
+# Python (aiwork)
+.venv/
+__pycache__/
+*.egg-info/
+
+# 설정 실물 (금지어·댓글 API 키) 은 ~/.aiwork/ 에만 둔다
+aiwork.toml
+.dev.vars
+wrangler.toml.local
+
+.DS_Store
+
+# 설계 문서 — 로컬 절대 경로가 적혀 있어 공개 판단 전까지 제외
+CLAUDE.md
+SPEC.md

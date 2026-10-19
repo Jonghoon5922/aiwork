@@ -4,7 +4,7 @@ import Base from '../../layouts/Base.astro';
 import PostList from '../../components/PostList.astro';
 import ProjectCard from '../../components/ProjectCard.astro';
 import CopyScript from '../../components/CopyScript.astro';
-import { PROJECT_TYPES, PROJECT_TYPE_LABEL } from '../../content.config';
+import { PROJECT_TYPES, PROJECT_TYPE_LABEL, STAGES, STAGE_LABEL, STAGE_QUESTION } from '../../content.config';
 import { url, fmtDate } from '../../lib/site';
 
 export async function getStaticPaths() {
@@ -21,8 +21,18 @@ const posts = (await getCollection('posts', ({ data }) => !data.draft && data.to
 const series = posts
   .filter((p) => p.data.kind === 'workbook' || p.data.kind === 'journal')
   .sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0));
-const others = posts.filter((p) => p.data.kind !== 'workbook' && p.data.kind !== 'journal');
+// 만드는 과정 — 이 주제에 속한 프로젝트의 개발 주기 글(분석→…→운영). "만든 것들" 은 카드로 보여 주므로 제외.
+const stageIndex = (k: string) => { const i = (STAGES as readonly string[]).indexOf(k); return i < 0 ? STAGES.length : i; };
+const making = topic.id === 'made' ? [] : posts
+  .filter((p) => (STAGES as readonly string[]).includes(p.data.kind))
+  .sort((a, b) => stageIndex(a.data.kind) - stageIndex(b.data.kind) || a.data.date.valueOf() - b.data.date.valueOf());
+const makingIds = new Set(making.map((p) => p.id));
+const others = posts.filter((p) => p.data.kind !== 'workbook' && p.data.kind !== 'journal' && !makingIds.has(p.id));
 const audiences = [...new Set(others.map((p) => p.data.audience).filter(Boolean))] as string[];
+const madeStages = new Set(making.map((p) => p.data.kind));
+const nextStage = STAGES.find((s) => !madeStages.has(s));
+// 이 주제에 연결된 프로젝트(카드의 topic 이 이 주제)가 있으면 글이 없어도 만드는 과정 진행표를 보여 준다.
+const linkedProjects = topic.id === 'made' ? [] : (await getCollection('projects')).filter((p) => p.data.topic === topic.id);
 
 // "만든 것들" 은 종류별 섹션으로 카드를 보여 준다.
 const projects = topic.id === 'made'
@@ -51,6 +61,38 @@ const sections = PROJECT_TYPES
       </ul>
     </>
   ))}
+
+  {topic.id !== 'made' && (making.length > 0 || linkedProjects.length > 0) && (
+    <>
+      <div class="section-head"><h2>이렇게 만들었어요</h2><span>왜 만들고, 어떻게 만들고, 돌려 보니 어떤가</span></div>
+      <ol class="stepper" aria-label="만드는 과정">
+        {STAGES.map((s) => (
+          <li class={madeStages.has(s) ? 'done' : s === nextStage ? 'current' : ''}>
+            <span class="step-label">{STAGE_LABEL[s]}</span>
+            <span class="step-q">{STAGE_QUESTION[s]}</span>
+            <span class="step-count">{making.filter((p) => p.data.kind === s).length ? `${making.filter((p) => p.data.kind === s).length}편` : ''}</span>
+          </li>
+        ))}
+      </ol>
+      {making.length === 0 ? (
+        <p class="empty">만드는 과정 글은 곧 올라와요. 분석(왜 만들었나)부터예요.</p>
+      ) : (
+        <ol class="series">
+          {making.map((post) => (
+            <li>
+              <a class="post-row" href={url(`/${post.id}`)}>
+                <span>
+                  <span class="title">{post.data.title}</span>
+                  <p class="summary">{post.data.summary}</p>
+                  <div class="meta"><span class="badge on">{STAGE_LABEL[post.data.kind as keyof typeof STAGE_LABEL]}</span><span>{fmtDate(post.data.date)}</span></div>
+                </span>
+              </a>
+            </li>
+          ))}
+        </ol>
+      )}
+    </>
+  )}
 
   {series.length > 0 && (
     <>

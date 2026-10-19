@@ -29,9 +29,9 @@ const pages = defineCollection({
 });
 
 // 만든 것 — "쓸 수 있는 것 하나" 가 카드 하나. 종류(type)로 섹션을 나누고 parent 로 묶는다.
-export const PROJECT_TYPES = ['service', 'mcp', 'skill', 'tool'] as const;
+export const PROJECT_TYPES = ['service', 'mcp', 'skill', 'tool', 'content'] as const;
 export const PROJECT_TYPE_LABEL: Record<(typeof PROJECT_TYPES)[number], string> = {
-  service: '서비스', mcp: 'MCP 서버', skill: '스킬', tool: '도구',
+  service: '서비스', mcp: 'MCP 서버', skill: '스킬', tool: '도구', content: '콘텐츠',
 };
 
 const projects = defineCollection({

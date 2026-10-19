@@ -11,7 +11,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
-from . import check
+from . import __version__, check
 from .config import AccessDenied, Config
 
 
@@ -29,6 +29,8 @@ def _call(config: Config, method: str, path: str, params: dict | None = None, bo
     req = urllib.request.Request(url, data=data, method=method, headers={
         "Authorization": f"Bearer {config.comments.api_key}",
         "Content-Type": "application/json",
+        # Cloudflare 가 Python 기본 UA 를 1010 으로 막는다. 우리가 누군지 밝힌다.
+        "User-Agent": f"aiwork-mcp/{__version__} (+https://aihago.com)",
     })
     try:
         with urllib.request.urlopen(req, timeout=20) as res:

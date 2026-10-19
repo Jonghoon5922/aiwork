@@ -11,7 +11,7 @@ export const VERIFY_GOOGLE = '';
 
 // 익명 댓글 (4단계). Worker 주소와 Turnstile site key. 비어 있으면 댓글 영역을 그리지 않는다.
 export const COMMENTS_API = 'https://comments.aihago.com';
-export const TURNSTILE_SITE_KEY = '';
+export const TURNSTILE_SITE_KEY = '0x4AAAAAAFbJvudDmPpPprxd';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 

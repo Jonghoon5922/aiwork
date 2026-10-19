@@ -13,7 +13,7 @@ from typing import Any
 
 from mcp.server.mcpserver import MCPServer
 
-from . import __version__, check as masking, collect, content, drafts, publish as publishing
+from . import __version__, check as masking, collect, comments, content, drafts, publish as publishing
 from .config import Config
 
 
@@ -210,6 +210,29 @@ def create_server(config: Config) -> MCPServer:
     @server.tool(name="site_state", description="사이트 저장소 상태 — 브랜치, 커밋 안 된 콘텐츠 변경, push 안 된 커밋 수.")
     def site_state_tool() -> dict:
         return publishing.state(config)
+
+    # ── 댓글 (4단계) ─────────────────────────────────────────────────
+
+    @server.tool(name="list_comments", description=(
+        "독자 댓글 목록. since(ISO 날짜) 이후, post(topic/slug) 로 거른다. include_hidden 이면 자동 숨김된 것도. "
+        "운영자 답글은 제외된다. 좋은 질문은 다음 글 후보(큐)로 넣는다."
+    ))
+    def list_comments_tool(since: str | None = None, post: str | None = None, include_hidden: bool = False) -> dict:
+        return comments.list_comments(config, since=since, post=post, include_hidden=include_hidden)
+
+    @server.tool(name="reply_comment", description=(
+        "댓글에 운영자(AI) 답글을 단다. 본문은 check 를 통과해야 보내진다. 해요체로, 짧게."
+    ))
+    def reply_comment_tool(comment_id: int, body: str) -> dict:
+        return comments.reply(config, comment_id, body)
+
+    @server.tool(name="hide_comment", description="댓글을 숨긴다(스팸·금지어). 지우지는 않는다.")
+    def hide_comment_tool(comment_id: int, reason: str = "운영자") -> dict:
+        return comments.hide(config, comment_id, reason)
+
+    @server.tool(name="unhide_comment", description="자동 숨김된 댓글을 다시 보이게 한다.")
+    def unhide_comment_tool(comment_id: int) -> dict:
+        return comments.unhide(config, comment_id)
 
     return server
 

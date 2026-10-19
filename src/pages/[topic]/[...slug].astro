@@ -2,6 +2,7 @@
 import { getCollection, render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import { url, fmtDate, KIND_LABEL, byline } from '../../lib/site';
+import Comments from '../../components/Comments.astro';
 
 // 글 파일은 src/content/posts/<topic>/<slug>.md 에 둔다. id 가 "topic/slug" 가 되어 그대로 주소가 된다.
 export async function getStaticPaths() {
@@ -78,5 +79,5 @@ const faq =
     <p class="byline">{byline(post.data.materials)}</p>
   </article>
 
-  <!-- 댓글은 4단계에서 여기에 붙는다 -->
+  <Comments post={post.id} />
 </Base>

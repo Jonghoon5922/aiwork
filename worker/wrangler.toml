@@ -1,0 +1,25 @@
+# 익명 댓글 Worker (SPEC 9절). 배포: cd worker && npx wrangler deploy
+name = "aihago-comments"
+main = "src/index.ts"
+compatibility_date = "2026-10-01"
+
+[vars]
+# 댓글 폼이 뜨는 사이트. CORS 허용 출처.
+SITE_ORIGIN = "https://aihago.com"
+# 답글 작성자 표시 이름
+OWNER_NAME = "AI하고"
+# 자동 숨김: 본문에 링크가 이 수 이상이면 숨긴다
+MAX_LINKS = "2"
+# 자동 숨김: 같은 IP 가 1분 안에 이 수 이상 쓰면 숨긴다
+RATE_PER_MINUTE = "3"
+
+# 비밀값은 wrangler secret put 으로 넣는다. 저장소에 쓰지 않는다.
+#   TURNSTILE_SECRET  — Turnstile 위젯의 secret key
+#   ADMIN_KEY         — MCP 가 쓰는 관리 키 (aiwork.toml [comments].api_key 와 같은 값)
+#   FORBIDDEN         — 자동 숨김 금지어, 쉼표로 구분 (선택)
+
+[[d1_databases]]
+binding = "DB"
+database_name = "aihago-comments"
+# database_id 는 `npx wrangler d1 create aihago-comments` 결과로 채운다
+database_id = "REPLACE_ME"

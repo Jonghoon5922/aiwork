@@ -1,0 +1,13 @@
+{
+  "name": "aihago-comments",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev",
+    "migrate": "wrangler d1 migrations apply aihago-comments --remote"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  }
+}

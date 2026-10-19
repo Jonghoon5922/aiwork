@@ -110,3 +110,19 @@ ol.list .item-title::before { content: counter(n) ". "; color: var(--muted); fon
 .faq summary { cursor: pointer; font-weight: 600; }
 .faq p { margin: 8px 0 4px; color: var(--muted); }
 .byline { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13.5px; }
+
+/* 댓글 */
+.comments { margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--line); }
+.comments-note { color: var(--muted); font-size: 14px; margin: 0 0 16px; }
+.comment-list { list-style: none; padding: 0; margin: 0 0 20px; }
+.comment { padding: 12px 0; border-bottom: 1px solid var(--line); }
+.comment p { margin: 6px 0 0; white-space: pre-wrap; }
+.comment.owner { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; margin-top: 8px; }
+.comment.empty { color: var(--muted); border: none; }
+.comment-who { font-weight: 600; font-size: 14px; }
+.comment.owner .comment-who { color: var(--accent); }
+.comment-when { color: var(--muted); font-size: 13px; margin-left: 10px; }
+.comment-form textarea { width: 100%; font: inherit; padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--card); color: var(--fg); resize: vertical; }
+.comment-actions { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 10px; }
+.comment-form button { font: inherit; padding: 8px 18px; border-radius: 999px; border: 1px solid var(--accent); background: var(--accent); color: #fff; cursor: pointer; }
+.comment-status { color: var(--muted); font-size: 14px; min-height: 1.4em; margin: 8px 0 0; }

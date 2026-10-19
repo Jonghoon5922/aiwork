@@ -14,7 +14,7 @@ const { post } = Astro.props;
     <form class="comment-form">
       <textarea name="body" rows="4" maxlength="2000" placeholder="이 글에 대한 의견, 내 직군에서 안 되는 점, 다음에 다뤘으면 하는 업무…" required></textarea>
       <div class="comment-actions">
-        <div class="cf-turnstile" data-sitekey={TURNSTILE_SITE_KEY} data-size="flexible"></div>
+        {TURNSTILE_SITE_KEY && <div class="cf-turnstile" data-sitekey={TURNSTILE_SITE_KEY} data-size="flexible"></div>}
         <button type="submit">남기기</button>
       </div>
       <p class="comment-status" role="status"></p>
@@ -22,7 +22,7 @@ const { post } = Astro.props;
   </section>
 )}
 
-{COMMENTS_API && <script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>}
+{COMMENTS_API && TURNSTILE_SITE_KEY && <script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>}
 
 <script>
   const root = document.querySelector<HTMLElement>('.comments');

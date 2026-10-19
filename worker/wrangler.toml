@@ -3,6 +3,9 @@ name = "aihago-comments"
 main = "src/index.ts"
 compatibility_date = "2026-10-01"
 
+# 사이트와 같은 도메인 아래에 둔다 (comments.aihago.com). workers.dev 대신 쓴다.
+routes = [{ pattern = "comments.aihago.com", custom_domain = true }]
+
 [vars]
 # 댓글 폼이 뜨는 사이트. CORS 허용 출처.
 SITE_ORIGIN = "https://aihago.com"
@@ -22,4 +25,4 @@ RATE_PER_MINUTE = "3"
 binding = "DB"
 database_name = "aihago-comments"
 # database_id 는 `npx wrangler d1 create aihago-comments` 결과로 채운다
-database_id = "REPLACE_ME"
+database_id = "97b1f388-fdd6-4490-8527-de8e881cb60e"

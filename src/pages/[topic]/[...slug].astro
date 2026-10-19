@@ -37,6 +37,10 @@ const prev = idx > 0 ? ordered[idx - 1] : null;
 const next = idx >= 0 && idx < ordered.length - 1 ? ordered[idx + 1] : null;
 const related = siblings.filter((p) => p.id !== post.id).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf()).slice(0, 3);
 
+// 글의 질문. 없으면 단계 질문(왜 만드나 …)이 대신 붙는다.
+const stageQuestion: Record<string, string> = STAGE_QUESTION;
+const questionText = post.data.question ?? stageQuestion[post.data.kind];
+
 const article = {
   '@context': 'https://schema.org',
   '@type': 'Article',
@@ -75,9 +79,7 @@ const faq =
       {post.data.series && post.data.order && <><span class="dot"></span><span>{post.data.series} {post.data.order}편</span></>}
     </div>
     <h1>{post.data.title}</h1>
-    {(post.data.question || (STAGE_QUESTION as Record<string, string>)[post.data.kind]) && (
-      <p class="question">{post.data.question ?? (STAGE_QUESTION as Record<string, string>)[post.data.kind]}</p>
-    )}
+    {questionText && <p class="question">{questionText}</p>}
     <div class="meta" style="margin:0 0 28px"><span>{fmtDate(post.data.date)}</span></div>
 
     <div class="prose">

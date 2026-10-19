@@ -12,7 +12,7 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
-from . import __version__, collect, config as cfg, content
+from . import __version__, collect, config as cfg, content, weekly as weekly_mod
 
 app = typer.Typer(add_completion=False, help="aiwork — AI 활용 사이트 운영 도구", no_args_is_help=True)
 
@@ -172,6 +172,21 @@ def serve() -> None:
     config = cfg.load()
     err.print(f"[dim]aiwork MCP 시작 — 프로젝트 {len(config.projects)}개, 원고 {len(config.sources)}개[/dim]")
     run(config)
+
+
+@app.command()
+def weekly(
+    as_json: bool = typer.Option(False, "--json", help="기계가 읽을 형태로"),
+    min_commits: int = typer.Option(weekly_mod.MIN_COMMITS, "--min-commits", help="이 미만이면 프로젝트를 건너뛴다"),
+    mark: bool = typer.Option(False, "--mark", help="이번 실행 시각을 기록한다 (다음 주 새 댓글 기준)"),
+) -> None:
+    """이번 주 할 일을 한 번에 모은다. 결과는 stdout — 스케줄로 뜬 Claude 가 읽는다."""
+    import json as _json
+    result = weekly_mod.gather(cfg.load(), min_commits=min_commits)
+    print(_json.dumps(result, ensure_ascii=False, indent=2) if as_json else weekly_mod.render(result))
+    if mark:
+        weekly_mod.mark_run(result["generated_at"])
+        err.print("[dim]실행 시각을 기록했다.[/dim]")
 
 
 @app.command()

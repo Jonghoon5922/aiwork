@@ -13,7 +13,7 @@ from typing import Any
 
 from mcp.server.mcpserver import MCPServer
 
-from . import __version__, check as masking, collect, comments, content, drafts, publish as publishing
+from . import __version__, check as masking, collect, comments, content, drafts, publish as publishing, weekly as weekly_mod
 from .config import Config
 
 
@@ -210,6 +210,20 @@ def create_server(config: Config) -> MCPServer:
     @server.tool(name="site_state", description="사이트 저장소 상태 — 브랜치, 커밋 안 된 콘텐츠 변경, push 안 된 커밋 수.")
     def site_state_tool() -> dict:
         return publishing.state(config)
+
+    # ── 주간 (5단계) ─────────────────────────────────────────────────
+
+    @server.tool(name="weekly", description=(
+        "이번 주 할 일을 한 번에 모은다: 변경 있는 프로젝트(개발 일지 후보), 사례 큐 다음 1건, "
+        "워크북 플레이스홀더 수와 게시된 편, 지난 실행 이후 새 댓글. 주간 실행의 첫 호출."
+    ))
+    def weekly_tool(min_commits: int = weekly_mod.MIN_COMMITS) -> dict:
+        return weekly_mod.gather(config, min_commits=min_commits)
+
+    @server.tool(name="mark_weekly_run", description="이번 주간 실행이 끝났음을 기록한다. 다음 주 '새 댓글' 기준 시각이 된다. 주간 실행의 마지막 호출.")
+    def mark_weekly_run_tool() -> dict:
+        weekly_mod.mark_run()
+        return {"ok": True, "last_run": weekly_mod.load_state().get("last_run")}
 
     # ── 댓글 (4단계) ─────────────────────────────────────────────────
 

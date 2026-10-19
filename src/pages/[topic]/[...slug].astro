@@ -42,7 +42,7 @@ const faq =
     : null;
 ---
 
-<Base title={post.data.title} description={post.data.summary}>
+<Base title={post.data.title} description={post.data.summary} type="article">
   <script type="application/ld+json" set:html={JSON.stringify(article)} />
   {faq && <script type="application/ld+json" set:html={JSON.stringify(faq)} />}
 

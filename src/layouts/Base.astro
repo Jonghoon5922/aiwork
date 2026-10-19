@@ -1,13 +1,26 @@
 ---
 import '../styles/global.css';
-import { SITE_NAME, SITE_TAGLINE, url } from '../lib/site';
+import { SITE_NAME, SITE_TAGLINE, url, VERIFY_NAVER, VERIFY_GOOGLE } from '../lib/site';
 
 interface Props {
   title: string;
   description?: string;
+  type?: 'website' | 'article';
+  image?: string;
 }
-const { title, description } = Astro.props;
+const { title, description, type = 'website', image } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
+const ogImage = new URL(image ?? '/og-default.png', Astro.site);
+const desc = description ?? SITE_TAGLINE;
+const isHome = Astro.url.pathname === '/' || Astro.url.pathname === '';
+const website = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: SITE_NAME,
+  url: Astro.site?.toString(),
+  description: SITE_TAGLINE,
+  inLanguage: 'ko',
+};
 ---
 
 <!doctype html>
@@ -17,9 +30,24 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generator" content={Astro.generator} />
     <title>{title === SITE_NAME ? title : `${title} · ${SITE_NAME}`}</title>
-    {description && <meta name="description" content={description} />}
+    <meta name="description" content={desc} />
     <link rel="canonical" href={canonical} />
     <link rel="sitemap" href={url('/sitemap-index.xml')} />
+    <link rel="alternate" type="application/rss+xml" title={SITE_NAME} href={url('/rss.xml')} />
+    <meta property="og:site_name" content={SITE_NAME} />
+    <meta property="og:type" content={type} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={desc} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:locale" content="ko_KR" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={desc} />
+    <meta name="twitter:image" content={ogImage} />
+    {VERIFY_NAVER && <meta name="naver-site-verification" content={VERIFY_NAVER} />}
+    {VERIFY_GOOGLE && <meta name="google-site-verification" content={VERIFY_GOOGLE} />}
+    {isHome && <script type="application/ld+json" set:html={JSON.stringify(website)} />}
   </head>
   <body>
     <header class="site-header">

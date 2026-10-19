@@ -4,11 +4,19 @@
 export const SITE_NAME = 'AI하고'; // 도메인 aihago.com
 export const SITE_TAGLINE = 'AI하고 일하고, AI하고 만들어요';
 
+// 검색 엔진 소유 확인 토큰. 서치어드바이저·서치콘솔에서 "HTML 태그" 방식을 고르면 주는 content 값.
+// 비어 있으면 태그를 내지 않는다.
+export const VERIFY_NAVER = '';
+export const VERIFY_GOOGLE = '';
+
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
+// 페이지 링크는 항상 끝에 / 를 붙인다 (trailingSlash: 'always'). 확장자가 있는 파일 링크는 그대로.
 export function url(path: string): string {
-  if (path === '/' || path === '') return base || '/';
-  return `${base}${path.startsWith('/') ? path : `/${path}`}`;
+  if (path === '/' || path === '') return (base || '') + '/';
+  let p = `${base}${path.startsWith('/') ? path : `/${path}`}`;
+  if (!/\.[a-z0-9]+$/i.test(p) && !p.endsWith('/')) p += '/';
+  return p;
 }
 
 export const fmtDate = (d: Date) =>

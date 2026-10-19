@@ -64,7 +64,10 @@ def gather(config: Config, min_commits: int = MIN_COMMITS, sample: int = 15) -> 
         last = content.last_published(config, project.name)
         since = last.until_commit if last else None
         n = collect.count_since(project, since)
-        if n < min_commits:
+        # 개발 주기 여섯 단계가 아직 다 안 나온 프로젝트는 커밋이 없어도 다음 단계 글을 쓴다 —
+        # 분석·설계·개발 글은 이미 있는 SPEC 과 기록이 재료라서 새 커밋이 필요 없다.
+        cycle_done = _next_stage(config, project.name) == "operate" and _stage_posts(config, project.name)["operate"] > 0
+        if n < min_commits and cycle_done:
             skipped.append({"project": project.name, "reason": f"이후 커밋 {n}건 (기준 {min_commits} 미만)"})
             continue
         changes = collect.get_changes(project, since=since, limit=sample)

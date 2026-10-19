@@ -4,7 +4,7 @@ import Base from '../../layouts/Base.astro';
 import PostList from '../../components/PostList.astro';
 import ProjectCard from '../../components/ProjectCard.astro';
 import CopyScript from '../../components/CopyScript.astro';
-import { PROJECT_TYPE_LABEL, STAGES, STAGE_LABEL } from '../../content.config';
+import { PROJECT_TYPE_LABEL, STAGES, STAGE_LABEL, STAGE_QUESTION } from '../../content.config';
 import { url, fmtDate, KIND_LABEL } from '../../lib/site';
 
 export async function getStaticPaths() {
@@ -61,12 +61,13 @@ const postCountOf = (slug: string) => allPosts.filter((p) => p.data.project === 
     </>
   )}
 
-  <div class="section-head"><h2>개발 주기</h2><span>분석부터 운영까지, 단계마다 한 편</span></div>
+  <div class="section-head"><h2>개발 주기</h2><span>왜 만들고, 어떻게 만들고, 돌려 보니 어떤가</span></div>
   <ol class="stepper" aria-label="개발 주기 진행">
     {STAGES.map((s) => (
       <li class={done.has(s) ? 'done' : s === currentStage ? 'current' : ''}>
         <span class="step-label">{STAGE_LABEL[s]}</span>
-        <span class="step-count">{posts.filter((p) => p.data.kind === s).length || ''}</span>
+        <span class="step-q">{STAGE_QUESTION[s]}</span>
+        <span class="step-count">{posts.filter((p) => p.data.kind === s).length ? `${posts.filter((p) => p.data.kind === s).length}편` : ''}</span>
       </li>
     ))}
   </ol>

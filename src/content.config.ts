@@ -62,6 +62,15 @@ export const STAGES = ['analysis', 'design', 'build', 'test', 'deploy', 'operate
 export const STAGE_LABEL: Record<(typeof STAGES)[number], string> = {
   analysis: '분석', design: '설계', build: '개발', test: '테스트', deploy: '배포', operate: '운영',
 };
+// 단계마다 글이 답하는 질문 하나. 독자는 이 질문 순서로 프로젝트를 따라 읽는다.
+export const STAGE_QUESTION: Record<(typeof STAGES)[number], string> = {
+  analysis: '왜 만드나',
+  design: '어떻게 만들 건가',
+  build: '실제로 어떻게 만들었나',
+  test: '제대로 되나',
+  deploy: '어떻게 내보냈나',
+  operate: '돌려 보니 어떤가',
+};
 export const KINDS = ['workbook', 'case', ...STAGES, 'decision', 'journal'] as const;
 
 const posts = defineCollection({

@@ -5,7 +5,7 @@ import PostList from '../../components/PostList.astro';
 import Comments from '../../components/Comments.astro';
 import CopyScript from '../../components/CopyScript.astro';
 import { url, fmtDate, KIND_LABEL, byline } from '../../lib/site';
-import { STAGES } from '../../content.config';
+import { STAGES, STAGE_QUESTION } from '../../content.config';
 
 // 글 파일은 src/content/posts/<topic>/<slug>.md 에 둔다. id 가 "topic/slug" 가 되어 그대로 주소가 된다.
 export async function getStaticPaths() {
@@ -75,7 +75,9 @@ const faq =
       {post.data.series && post.data.order && <><span class="dot"></span><span>{post.data.series} {post.data.order}편</span></>}
     </div>
     <h1>{post.data.title}</h1>
-    {post.data.question && <p class="question">{post.data.question}</p>}
+    {(post.data.question || (STAGE_QUESTION as Record<string, string>)[post.data.kind]) && (
+      <p class="question">{post.data.question ?? (STAGE_QUESTION as Record<string, string>)[post.data.kind]}</p>
+    )}
     <div class="meta" style="margin:0 0 28px"><span>{fmtDate(post.data.date)}</span></div>
 
     <div class="prose">

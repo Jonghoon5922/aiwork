@@ -12,7 +12,9 @@ const { title, description, type = 'website', image } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const ogImage = new URL(image ?? '/og-default.png', Astro.site);
 const desc = description ?? SITE_TAGLINE;
-const isHome = Astro.url.pathname === '/' || Astro.url.pathname === '';
+const path = Astro.url.pathname;
+const isHome = path === '/' || path === '';
+const current = (prefix: string) => (path.startsWith(prefix) ? 'page' : undefined);
 const website = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
@@ -34,6 +36,8 @@ const website = {
     <link rel="canonical" href={canonical} />
     <link rel="sitemap" href={url('/sitemap-index.xml')} />
     <link rel="alternate" type="application/rss+xml" title={SITE_NAME} href={url('/rss.xml')} />
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
     <meta property="og:site_name" content={SITE_NAME} />
     <meta property="og:type" content={type} />
     <meta property="og:title" content={title} />
@@ -52,11 +56,12 @@ const website = {
   <body>
     <header class="site-header">
       <div class="wrap">
-        <a class="brand" href={url('/')}>{SITE_NAME}</a>
+        <a class="brand" href={url('/')}><span class="brand-mark"></span>{SITE_NAME}</a>
         <nav class="nav">
-          <a href={url('/ai-biseo')}>AI 업무 비서</a>
-          <a href={url('/made')}>만든 것들</a>
-          <a href={url('/how-this-runs')}>운영 방식</a>
+          <a href={url('/ai-biseo')} aria-current={current('/ai-biseo')}>AI 업무 비서</a>
+          <a href={url('/made')} aria-current={current('/made')}>만든 것들</a>
+          <a href={url('/claude-code')} aria-current={current('/claude-code')}>Claude Code</a>
+          <a href={url('/how-this-runs')} aria-current={current('/how-this-runs')}>운영 방식</a>
         </nav>
       </div>
     </header>
@@ -69,7 +74,12 @@ const website = {
 
     <footer class="site-footer">
       <div class="wrap">
-        {SITE_TAGLINE}. 로그인 없이 읽고, 그대로 가져가고, 의견을 남겨요.
+        <span>{SITE_TAGLINE}. 로그인 없이 읽고, 그대로 가져가고, 의견을 남겨요.</span>
+        <nav>
+          <a href={url('/rss.xml')}>RSS</a>
+          <a href={url('/llms.txt')}>llms.txt</a>
+          <a href="https://github.com/Jonghoon5922/aiwork">GitHub</a>
+        </nav>
       </div>
     </footer>
   </body>

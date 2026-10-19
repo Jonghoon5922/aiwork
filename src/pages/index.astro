@@ -1,51 +1,51 @@
 ---
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
-import { SITE_NAME, SITE_TAGLINE, url, fmtDate, KIND_LABEL } from '../lib/site';
+import PostList from '../components/PostList.astro';
+import { SITE_NAME, SITE_TAGLINE, url } from '../lib/site';
 
 const topics = (await getCollection('topics')).sort((a, b) => a.data.order - b.data.order);
-const posts = (await getCollection('posts', ({ data }) => !data.draft))
-  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
-  .slice(0, 10);
+const allPosts = (await getCollection('posts', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
+const recent = allPosts.slice(0, 8);
+const countBy = (id: string) => allPosts.filter((p) => p.data.topic === id).length;
 const topicName = (id: string) => topics.find((t) => t.id === id)?.data.name ?? id;
 ---
 
 <Base title={SITE_NAME} description={SITE_TAGLINE}>
-  <h1>{SITE_TAGLINE}</h1>
-  <p class="lede">
-    직군이 무엇이든 AI를 내 일에 끌어다 쓰는 법, 그리고 AI와 직접 만든 것들의 기록이에요.
-    글은 Claude가 쓰고 검사를 거쳐 자동으로 올라와요.
-  </p>
+  <section class="hero">
+    <h1>{SITE_TAGLINE}</h1>
+    <p>
+      직군이 무엇이든 AI를 내 일에 끌어다 쓰는 법, 그리고 AI와 직접 만든 것들의 기록이에요.
+      프롬프트와 확인 항목은 그대로 복사해서 쓰면 돼요.
+    </p>
+    <div class="cta">
+      <a class="btn primary" href={url('/ai-biseo')}>AI 업무 비서 시작하기</a>
+      <a class="btn" href={url('/made')}>만든 것들 보기</a>
+    </div>
+  </section>
 
-  <h2>주제</h2>
+  <div class="section-head"><h2>주제</h2></div>
   <ul class="cards">
     {topics.map((t) => (
       <li>
-        <a class="card" href={url(`/${t.id}`)} style="display:block">
+        <a class="card" href={url(`/${t.id}`)}>
           <h3>{t.data.name}</h3>
           <p>{t.data.summary}</p>
+          <span class="count">{countBy(t.id) > 0 ? `글 ${countBy(t.id)}편` : '준비 중'}</span>
         </a>
       </li>
     ))}
   </ul>
 
-  <h2>최근 글</h2>
-  {posts.length === 0 ? (
+  <div class="section-head">
+    <h2>최근 글</h2>
+    <a href={url('/rss.xml')}>RSS로 받기</a>
+  </div>
+  {recent.length === 0 ? (
     <p class="empty">아직 글이 없어요. 첫 글은 곧 올라와요.</p>
   ) : (
-    <ul class="list">
-      {posts.map((post) => (
-        <li>
-          <a class="item-title" href={url(`/${post.id}`)}>{post.data.title}</a>
-          <div class="meta">
-            <span>{fmtDate(post.data.date)}</span>
-            <span>·</span>
-            <span>{topicName(post.data.topic)}</span>
-            <span>·</span>
-            <span>{KIND_LABEL[post.data.kind]}</span>
-          </div>
-        </li>
-      ))}
-    </ul>
+    <PostList posts={recent} showTopic topicName={topicName} />
   )}
 </Base>

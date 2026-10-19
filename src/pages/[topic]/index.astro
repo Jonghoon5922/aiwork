@@ -1,7 +1,8 @@
 ---
 import { getCollection, render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
-import { url, fmtDate, KIND_LABEL } from '../../lib/site';
+import PostList from '../../components/PostList.astro';
+import { url, fmtDate } from '../../lib/site';
 
 export async function getStaticPaths() {
   const topics = await getCollection('topics');
@@ -14,17 +15,17 @@ const { Content } = await render(topic);
 const posts = (await getCollection('posts', ({ data }) => !data.draft && data.topic === topic.id))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 
-// 워크북 연재는 순서대로
 const series = posts
   .filter((p) => p.data.kind === 'workbook')
   .sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0));
 const others = posts.filter((p) => p.data.kind !== 'workbook');
+const audiences = [...new Set(others.map((p) => p.data.audience).filter(Boolean))] as string[];
 
-// "만든 것들"은 프로젝트 카드가 먼저
 const projects =
   topic.id === 'made'
     ? (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order)
     : [];
+const postCountOf = (slug: string) => posts.filter((p) => p.data.project === slug).length;
 ---
 
 <Base title={topic.data.name} description={topic.data.summary}>
@@ -34,17 +35,18 @@ const projects =
 
   {projects.length > 0 && (
     <>
-      <h2>프로젝트</h2>
+      <div class="section-head"><h2>프로젝트</h2></div>
       <ul class="cards">
         {projects.map((p) => (
           <li>
-            <a class="card" href={url(`/projects/${p.id}`)} style="display:block">
+            <a class="card" href={url(`/projects/${p.id}`)}>
               <h3>{p.data.name}</h3>
               <p>{p.data.summary}</p>
-              <div class="badges">
+              <div class="badges" style="margin-top:12px">
                 <span class="badge on">{p.data.status}</span>
-                {p.data.stack.map((s) => <span class="badge">{s}</span>)}
+                {p.data.stack.slice(0, 3).map((s) => <span class="badge">{s}</span>)}
               </div>
+              <span class="count">{postCountOf(p.id) > 0 ? `글 ${postCountOf(p.id)}편` : '소개 글 준비 중'}</span>
             </a>
           </li>
         ))}
@@ -54,35 +56,46 @@ const projects =
 
   {series.length > 0 && (
     <>
-      <h2>{series[0].data.series ?? '연재'}</h2>
-      <ol class="list">
+      <div class="section-head"><h2>{series[0].data.series ?? '연재'}</h2><span>순서대로 읽어요</span></div>
+      <ol class="series">
         {series.map((post) => (
           <li>
-            <a class="item-title" href={url(`/${post.id}`)}>{post.data.title}</a>
-            <div class="meta"><span>{fmtDate(post.data.date)}</span></div>
+            <a class="post-row" href={url(`/${post.id}`)}>
+              <span>
+                <span class="title">{post.data.title}</span>
+                <p class="summary">{post.data.summary}</p>
+                <div class="meta"><span>{fmtDate(post.data.date)}</span></div>
+              </span>
+            </a>
           </li>
         ))}
       </ol>
     </>
   )}
 
-  <h2>글</h2>
+  <div class="section-head"><h2>{topic.id === 'ai-biseo' ? '직군별 사례' : '글'}</h2></div>
   {others.length === 0 && series.length === 0 ? (
-    <p class="empty">아직 글이 없어요.</p>
+    <p class="empty">아직 글이 없어요. 주 1회 올라와요.</p>
   ) : others.length === 0 ? null : (
-    <ul class="list">
-      {others.map((post) => (
-        <li>
-          <a class="item-title" href={url(`/${post.id}`)}>{post.data.title}</a>
-          <div class="meta">
-            <span>{fmtDate(post.data.date)}</span>
-            <span>·</span>
-            <span>{KIND_LABEL[post.data.kind]}</span>
-            {post.data.audience && <span>· {post.data.audience}</span>}
-            {post.data.project && <span>· {post.data.project}</span>}
-          </div>
-        </li>
-      ))}
-    </ul>
+    <>
+      {audiences.length > 1 && (
+        <div class="chips" role="group" aria-label="직군 필터">
+          <button class="chip" aria-pressed="true" data-audience="">전체</button>
+          {audiences.map((a) => <button class="chip" aria-pressed="false" data-audience={a}>{a}</button>)}
+        </div>
+      )}
+      <PostList posts={others} filterable />
+    </>
   )}
 </Base>
+
+<script>
+  // 직군 칩 필터 — 서버에서 다 그려 두고 숨기기만 한다. JS 가 없어도 전체가 보인다.
+  const chips = document.querySelectorAll<HTMLButtonElement>('.chip');
+  const rows = document.querySelectorAll<HTMLLIElement>('.posts li[data-audience]');
+  chips.forEach((chip) => chip.addEventListener('click', () => {
+    const pick = chip.dataset.audience ?? '';
+    chips.forEach((c) => c.setAttribute('aria-pressed', String(c === chip)));
+    rows.forEach((li) => { li.hidden = pick !== '' && li.dataset.audience !== pick; });
+  }));
+</script>

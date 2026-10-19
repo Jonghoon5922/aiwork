@@ -1,7 +1,8 @@
 ---
 import { getCollection, render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
-import { url, fmtDate, KIND_LABEL } from '../../lib/site';
+import PostList from '../../components/PostList.astro';
+import { url } from '../../lib/site';
 
 export async function getStaticPaths() {
   const projects = await getCollection('projects');
@@ -15,31 +16,20 @@ const posts = (await getCollection('posts', ({ data }) => !data.draft && data.pr
 ---
 
 <Base title={project.data.name} description={project.data.summary}>
+  <div class="meta" style="margin:0 0 10px"><a href={url('/made')}>만든 것들</a></div>
   <h1>{project.data.name}</h1>
   <p class="lede">{project.data.summary}</p>
   <div class="badges" style="margin-bottom:24px">
     <span class="badge on">{project.data.status}</span>
     {project.data.stack.map((s) => <span class="badge">{s}</span>)}
-    {project.data.repo && <a class="badge" href={project.data.repo}>저장소</a>}
+    {project.data.repo && <a class="badge" href={project.data.repo}>저장소 ↗</a>}
   </div>
   <div class="prose"><Content /></div>
 
-  <h2>이 프로젝트의 글</h2>
+  <div class="section-head"><h2>이 프로젝트의 글</h2></div>
   {posts.length === 0 ? (
     <p class="empty">아직 글이 없어요. 소개 글부터 올라와요.</p>
   ) : (
-    <ul class="list">
-      {posts.map((post) => (
-        <li>
-          <a class="item-title" href={url(`/${post.id}`)}>{post.data.title}</a>
-          <div class="meta">
-            <span>{fmtDate(post.data.date)}</span>
-            <span>·</span>
-            <span>{KIND_LABEL[post.data.kind]}</span>
-            {post.data.until_commit && <span>· {post.data.until_commit} 까지</span>}
-          </div>
-        </li>
-      ))}
-    </ul>
+    <PostList posts={posts} />
   )}
 </Base>

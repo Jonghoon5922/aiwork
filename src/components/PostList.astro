@@ -1,0 +1,31 @@
+---
+// 글 목록 한 벌. 홈·주제·프로젝트 페이지가 같이 쓴다.
+import type { CollectionEntry } from 'astro:content';
+import { url, fmtDate, KIND_LABEL } from '../lib/site';
+
+interface Props {
+  posts: CollectionEntry<'posts'>[];
+  showTopic?: boolean;
+  topicName?: (id: string) => string;
+  filterable?: boolean; // data-audience 를 붙여 칩 필터가 숨길 수 있게
+}
+const { posts, showTopic = false, topicName = (id) => id, filterable = false } = Astro.props;
+---
+
+<ul class="posts">
+  {posts.map((post) => (
+    <li data-audience={filterable ? (post.data.audience ?? '') : undefined}>
+      <a class="post-row" href={url(`/${post.id}`)}>
+        <span class="title">{post.data.title}</span>
+        <p class="summary">{post.data.summary}</p>
+        <div class="meta">
+          <span class="badge on">{KIND_LABEL[post.data.kind]}</span>
+          {post.data.audience && <span class="badge">{post.data.audience}</span>}
+          {post.data.project && <span class="badge">{post.data.project}</span>}
+          {showTopic && <span>{topicName(post.data.topic)}</span>}
+          <span>{fmtDate(post.data.date)}</span>
+        </div>
+      </a>
+    </li>
+  ))}
+</ul>

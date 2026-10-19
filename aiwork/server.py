@@ -13,7 +13,7 @@ from typing import Any
 
 from mcp.server.mcpserver import MCPServer
 
-from . import __version__, collect, content
+from . import __version__, check as masking, collect, content, drafts, publish as publishing
 from .config import Config
 
 
@@ -45,6 +45,12 @@ def build_instructions(config: Config) -> str:
     )
     lines.append(
         "public = false 인 프로젝트는 재료 수집 자체가 거부된다. 우회하지 않는다."
+    )
+    lines.append(
+        "초안을 저장한 뒤 check 가 통과(block 0)하면 approve → publish 까지 사람 확인 없이 이어서 호출한다. "
+        "block 이 남아 있으면 본문을 고쳐 update_post 하고 다시 check 한다. "
+        "'[저자 경험 넣을 자리' 는 지어내 채우지 않는다 — 그 글은 사용자가 채울 때까지 둔다. "
+        "잘못 나간 글은 unpublish → publish 로 내린다."
     )
     return "\n".join(lines)
 
@@ -130,6 +136,80 @@ def create_server(config: Config) -> MCPServer:
     @server.tool(name="read_doc", description="프로젝트 안 문서의 원문. 등록된 폴더 밖은 거부된다.")
     def read_doc_tool(project: str, path: str) -> dict:
         return collect.read_doc(config.project(project), path)
+
+    # ── 원고 ─────────────────────────────────────────────────────────
+
+    @server.tool(name="save_draft", description=(
+        "초안을 drafts/<topic>/ 에 저장하고 곧바로 마스킹 검사를 돌려 결과를 돌려준다. "
+        "kind 는 workbook/case/intro/devlog/decision/release. case 는 audience, workbook 은 series·order, "
+        "프로젝트 글(intro/devlog/decision/release)은 project 가 필요하고 until_commit 을 비우면 현재 HEAD 로 박는다. "
+        "question 은 사람이 검색창이나 AI 에 실제로 치는 문장. materials 는 글 하단 고정 문구에 들어가는 재료 설명. "
+        "큐에서 꺼낸 글이면 queue_id 를 넣는다 — approve 때 큐 상태가 '게시' 로 바뀐다. 초안은 저장소에 올라가지 않는다."
+    ))
+    def save_draft_tool(topic: str, kind: str, title: str, body: str, summary: str,
+                        question: str | None = None, audience: str | None = None, series: str | None = None,
+                        order: int | None = None, project: str | None = None, until_commit: str | None = None,
+                        materials: str | None = None, faq: list[dict] | None = None, tags: list[str] | None = None,
+                        queue_id: str | None = None, slug: str | None = None) -> dict:
+        return drafts.save_draft(config, topic=topic, kind=kind, title=title, body=body, summary=summary,
+                                 question=question, audience=audience, series=series, order=order, project=project,
+                                 until_commit=until_commit, materials=materials, faq=faq, tags=tags,
+                                 queue_id=queue_id, slug=slug)
+
+    @server.tool(name="update_post", description=(
+        "글이나 초안의 본문·제목·요약·질문·태그·FAQ 를 고친다. 고친 뒤 곧바로 검사한다. "
+        "게시된 글은 publish 를 다시 해야 사이트에 반영된다."
+    ))
+    def update_post_tool(post_id: str, body: str | None = None, title: str | None = None, summary: str | None = None,
+                         question: str | None = None, tags: list[str] | None = None, faq: list[dict] | None = None) -> dict:
+        return drafts.update_post(config, post_id=post_id, body=body, title=title, summary=summary,
+                                  question=question, tags=tags, faq=faq)
+
+    # ── 관문 ─────────────────────────────────────────────────────────
+
+    @server.tool(name="check", description=(
+        "마스킹 검사. draft_id(topic/slug) 또는 text 중 하나를 준다. "
+        "block: 금지어, 키·이메일 패턴, 등록되지 않은 절대 경로, '[저자 경험 넣을 자리' 플레이스홀더. "
+        "warn: AI 스러운 문체(비단정 표현 과다, 표 과다). block 이 하나라도 있으면 approve 할 수 없다. "
+        "걸린 원문은 그대로 돌려주지 않는다."
+    ))
+    def check_tool(draft_id: str | None = None, text: str | None = None) -> dict:
+        if text is not None:
+            return masking.check_text(text, config)
+        if not draft_id:
+            raise ValueError("draft_id 나 text 중 하나는 필요하다.")
+        path, _ = drafts._find(config, draft_id)
+        result = masking.check_file(path, config)
+        result["id"] = draft_id
+        return result
+
+    @server.tool(name="approve", description=(
+        "check 통과를 확인하고 초안을 posts/ 로 옮긴다. 큐에 연결된 글이면 큐 상태를 '게시' 로 바꾼다. "
+        "check 통과 시 사람 확인 없이 호출해도 된다 (자동 게시 정책). 이어서 publish 를 호출한다."
+    ))
+    def approve_tool(draft_id: str) -> dict:
+        return drafts.approve(config, draft_id)
+
+    # ── 운영 ─────────────────────────────────────────────────────────
+
+    @server.tool(name="publish", description=(
+        "src/content 의 변경(승인된 글, 큐 상태, 내린 글)을 커밋하고 push 한다. push 가 곧 배포다. "
+        "check 를 통과한 글만 posts/ 에 있으므로 사람 확인 없이 호출해도 된다."
+    ))
+    def publish_tool(message: str | None = None) -> dict:
+        return publishing.publish(config, message=message)
+
+    @server.tool(name="unpublish", description="게시된 글을 사이트에서 내린다(draft: true). 이어서 publish 를 호출해야 실제로 내려간다. 비상구다.")
+    def unpublish_tool(post_id: str) -> dict:
+        return drafts.unpublish(config, post_id)
+
+    @server.tool(name="deploy_status", description="GitHub Actions 최근 빌드·배포 상태. publish 뒤에 확인한다.")
+    def deploy_status_tool() -> dict:
+        return publishing.deploy_status(config)
+
+    @server.tool(name="site_state", description="사이트 저장소 상태 — 브랜치, 커밋 안 된 콘텐츠 변경, push 안 된 커밋 수.")
+    def site_state_tool() -> dict:
+        return publishing.state(config)
 
     return server
 

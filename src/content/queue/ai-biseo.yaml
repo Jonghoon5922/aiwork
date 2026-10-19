@@ -1,0 +1,48 @@
+# 사례 큐 — 직군 × 업무. 주간 실행이 '대기' 중 맨 위를 꺼낸다.
+# 처음 9건은 워크북의 세 직군 × 세 업무. 독자 댓글에서 나온 직군·업무는 아래에 추가한다.
+- id: hr-inquiry
+  audience: 인사 담당자
+  task: 직원 제도 문의 답변
+  question: 인사팀인데 직원 문의 답변에 AI를 어떻게 쓰나요
+  status: 대기
+  source: 워크북 3~6일차 주 사례
+- id: hr-job-posting
+  audience: 인사 담당자
+  task: 채용 공고 문안
+  question: 채용 공고를 AI로 쓰면 어디까지 믿어도 되나요
+  status: 대기
+- id: hr-interview-questions
+  audience: 인사 담당자
+  task: 면접 질문지 직무별 수정
+  question: 면접 질문을 직무별로 AI에게 만들게 해도 되나요
+  status: 대기
+- id: teacher-essay-items
+  audience: 교사
+  task: 서술형 문항 출제
+  question: 서술형 평가 문항을 AI로 만들 때 진도와 채점 기준은 어떻게 맞추나요
+  status: 대기
+- id: teacher-feedback
+  audience: 교사
+  task: 학생 소감문 피드백 한 줄
+  question: 학생 글에 피드백을 AI로 달아도 되나요, 이름은 어떻게 하나요
+  status: 대기
+- id: teacher-worksheet
+  audience: 교사
+  task: 학습지 만들기
+  question: 수업 학습지를 AI로 만드는 순서가 있나요
+  status: 대기
+- id: marketer-sns
+  audience: 마케터
+  task: SNS 게시글 초안
+  question: 마케터인데 SNS 글 초안을 AI에게 맡기면 톤이 안 맞아요
+  status: 대기
+- id: marketer-report-comment
+  audience: 마케터
+  task: 주간 성과 보고서 코멘트
+  question: 광고 성과 숫자를 AI에게 넘겨 코멘트를 받아도 되나요
+  status: 대기
+- id: marketer-survey
+  audience: 마케터
+  task: 설문 응답 공통 의견 뽑기
+  question: 설문 응답 수백 건에서 공통 의견을 AI로 뽑는 법
+  status: 대기

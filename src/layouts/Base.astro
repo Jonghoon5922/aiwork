@@ -1,0 +1,48 @@
+---
+import '../styles/global.css';
+import { SITE_NAME, SITE_TAGLINE, url } from '../lib/site';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+const { title, description } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title === SITE_NAME ? title : `${title} · ${SITE_NAME}`}</title>
+    {description && <meta name="description" content={description} />}
+    <link rel="canonical" href={canonical} />
+    <link rel="sitemap" href={url('/sitemap-index.xml')} />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="wrap">
+        <a class="brand" href={url('/')}>{SITE_NAME}</a>
+        <nav class="nav">
+          <a href={url('/ai-biseo')}>AI 업무 비서</a>
+          <a href={url('/made')}>만든 것들</a>
+          <a href={url('/how-this-runs')}>운영 방식</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <div class="wrap">
+        <slot />
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap">
+        {SITE_TAGLINE}. 로그인 없이 읽고, 그대로 가져가고, 의견을 남겨요.
+      </div>
+    </footer>
+  </body>
+</html>

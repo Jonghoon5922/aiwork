@@ -1,0 +1,51 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import { SITE_NAME, SITE_TAGLINE, url, fmtDate, KIND_LABEL } from '../lib/site';
+
+const topics = (await getCollection('topics')).sort((a, b) => a.data.order - b.data.order);
+const posts = (await getCollection('posts', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 10);
+const topicName = (id: string) => topics.find((t) => t.id === id)?.data.name ?? id;
+---
+
+<Base title={SITE_NAME} description={SITE_TAGLINE}>
+  <h1>{SITE_TAGLINE}</h1>
+  <p class="lede">
+    직군이 무엇이든 AI를 내 일에 끌어다 쓰는 법, 그리고 AI와 직접 만든 것들의 기록이에요.
+    글은 Claude가 쓰고 검사를 거쳐 자동으로 올라와요.
+  </p>
+
+  <h2>주제</h2>
+  <ul class="cards">
+    {topics.map((t) => (
+      <li>
+        <a class="card" href={url(`/${t.id}`)} style="display:block">
+          <h3>{t.data.name}</h3>
+          <p>{t.data.summary}</p>
+        </a>
+      </li>
+    ))}
+  </ul>
+
+  <h2>최근 글</h2>
+  {posts.length === 0 ? (
+    <p class="empty">아직 글이 없어요. 첫 글은 곧 올라와요.</p>
+  ) : (
+    <ul class="list">
+      {posts.map((post) => (
+        <li>
+          <a class="item-title" href={url(`/${post.id}`)}>{post.data.title}</a>
+          <div class="meta">
+            <span>{fmtDate(post.data.date)}</span>
+            <span>·</span>
+            <span>{topicName(post.data.topic)}</span>
+            <span>·</span>
+            <span>{KIND_LABEL[post.data.kind]}</span>
+          </div>
+        </li>
+      ))}
+    </ul>
+  )}
+</Base>

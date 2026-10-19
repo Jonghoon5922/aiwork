@@ -1,0 +1,30 @@
+// 사이트 공통 상수와 링크 도우미.
+// base 가 있든 없든(커스텀 도메인 전·후) 링크가 깨지지 않게 모든 내부 링크는 url() 을 거친다.
+
+export const SITE_NAME = 'aiwork'; // 사이트 이름 미정 — 정해지면 여기만 바꾼다
+export const SITE_TAGLINE = 'AI로 일하고, AI로 만들고, AI가 기록하는 곳';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+export function url(path: string): string {
+  if (path === '/' || path === '') return base || '/';
+  return `${base}${path.startsWith('/') ? path : `/${path}`}`;
+}
+
+export const fmtDate = (d: Date) =>
+  d.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' });
+
+export const KIND_LABEL: Record<string, string> = {
+  workbook: '워크북',
+  case: '사례',
+  intro: '소개',
+  devlog: '개발 일지',
+  decision: '결정 기록',
+  release: '릴리즈',
+};
+
+// 글 하단 고정 문구 (SPEC 3절). 숨길 일이 아니라 이 사이트의 차별점이다.
+export function byline(materials?: string): string {
+  const m = materials ? `${materials}에서 재료를 얻어 ` : '';
+  return `이 글은 ${m}Claude가 썼고, 마스킹 검사를 거쳐 자동 게시됐습니다.`;
+}

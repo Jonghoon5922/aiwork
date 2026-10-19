@@ -1,0 +1,88 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { url, fmtDate, KIND_LABEL } from '../../lib/site';
+
+export async function getStaticPaths() {
+  const topics = await getCollection('topics');
+  return topics.map((topic) => ({ params: { topic: topic.id }, props: { topic } }));
+}
+
+const { topic } = Astro.props;
+const { Content } = await render(topic);
+
+const posts = (await getCollection('posts', ({ data }) => !data.draft && data.topic === topic.id))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+// 워크북 연재는 순서대로
+const series = posts
+  .filter((p) => p.data.kind === 'workbook')
+  .sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0));
+const others = posts.filter((p) => p.data.kind !== 'workbook');
+
+// "만든 것들"은 프로젝트 카드가 먼저
+const projects =
+  topic.id === 'made'
+    ? (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order)
+    : [];
+---
+
+<Base title={topic.data.name} description={topic.data.summary}>
+  <h1>{topic.data.name}</h1>
+  <p class="lede">{topic.data.summary}</p>
+  <div class="prose"><Content /></div>
+
+  {projects.length > 0 && (
+    <>
+      <h2>프로젝트</h2>
+      <ul class="cards">
+        {projects.map((p) => (
+          <li>
+            <a class="card" href={url(`/projects/${p.id}`)} style="display:block">
+              <h3>{p.data.name}</h3>
+              <p>{p.data.summary}</p>
+              <div class="badges">
+                <span class="badge on">{p.data.status}</span>
+                {p.data.stack.map((s) => <span class="badge">{s}</span>)}
+              </div>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </>
+  )}
+
+  {series.length > 0 && (
+    <>
+      <h2>{series[0].data.series ?? '연재'}</h2>
+      <ol class="list">
+        {series.map((post) => (
+          <li>
+            <a class="item-title" href={url(`/${post.id}`)}>{post.data.title}</a>
+            <div class="meta"><span>{fmtDate(post.data.date)}</span></div>
+          </li>
+        ))}
+      </ol>
+    </>
+  )}
+
+  <h2>글</h2>
+  {others.length === 0 && series.length === 0 ? (
+    <p class="empty">아직 글이 없어요.</p>
+  ) : others.length === 0 ? null : (
+    <ul class="list">
+      {others.map((post) => (
+        <li>
+          <a class="item-title" href={url(`/${post.id}`)}>{post.data.title}</a>
+          <div class="meta">
+            <span>{fmtDate(post.data.date)}</span>
+            <span>·</span>
+            <span>{KIND_LABEL[post.data.kind]}</span>
+            {post.data.audience && <span>· {post.data.audience}</span>}
+            {post.data.project && <span>· {post.data.project}</span>}
+          </div>
+        </li>
+      ))}
+    </ul>
+  )}
+</Base>

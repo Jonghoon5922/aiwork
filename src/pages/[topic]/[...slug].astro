@@ -1,0 +1,82 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { url, fmtDate, KIND_LABEL, byline } from '../../lib/site';
+
+// 글 파일은 src/content/posts/<topic>/<slug>.md 에 둔다. id 가 "topic/slug" 가 되어 그대로 주소가 된다.
+export async function getStaticPaths() {
+  const posts = await getCollection('posts', ({ data }) => !data.draft);
+  return posts.map((post) => {
+    const [topic, ...rest] = post.id.split('/');
+    return { params: { topic, slug: rest.join('/') }, props: { post } };
+  });
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+const topics = await getCollection('topics');
+const topic = topics.find((t) => t.id === post.data.topic);
+
+// 검색·AI 인용용 구조화 데이터 (SPEC 5절). FAQ 가 있으면 FAQPage 도 함께.
+const article = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: post.data.title,
+  description: post.data.summary,
+  datePublished: post.data.date.toISOString(),
+  inLanguage: 'ko',
+  author: { '@type': 'Person', name: 'Jonghoon' },
+  mainEntityOfPage: new URL(Astro.url.pathname, Astro.site).toString(),
+};
+const faq =
+  post.data.faq.length > 0
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: post.data.faq.map((f) => ({
+          '@type': 'Question',
+          name: f.q,
+          acceptedAnswer: { '@type': 'Answer', text: f.a },
+        })),
+      }
+    : null;
+---
+
+<Base title={post.data.title} description={post.data.summary}>
+  <script type="application/ld+json" set:html={JSON.stringify(article)} />
+  {faq && <script type="application/ld+json" set:html={JSON.stringify(faq)} />}
+
+  <article>
+    <h1>{post.data.title}</h1>
+    {post.data.question && <p class="lede">“{post.data.question}”</p>}
+    <div class="meta" style="margin-bottom:32px">
+      <span>{fmtDate(post.data.date)}</span>
+      <span>·</span>
+      <a href={url(`/${post.data.topic}`)}>{topic?.data.name ?? post.data.topic}</a>
+      <span>·</span>
+      <span>{KIND_LABEL[post.data.kind]}</span>
+      {post.data.audience && <span>· {post.data.audience}</span>}
+      {post.data.project && <a href={url(`/projects/${post.data.project}`)}>· {post.data.project}</a>}
+    </div>
+
+    <div class="prose">
+      <Content />
+    </div>
+
+    {post.data.faq.length > 0 && (
+      <section class="faq">
+        <h2>자주 묻는 것</h2>
+        {post.data.faq.map((f) => (
+          <details>
+            <summary>{f.q}</summary>
+            <p>{f.a}</p>
+          </details>
+        ))}
+      </section>
+    )}
+
+    <p class="byline">{byline(post.data.materials)}</p>
+  </article>
+
+  <!-- 댓글은 4단계에서 여기에 붙는다 -->
+</Base>

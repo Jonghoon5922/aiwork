@@ -19,13 +19,16 @@ def _git(config: Config, *args: str) -> tuple[int, str]:
         ["git", "-C", str(config.site.path), "-c", "core.quotepath=false", *args],
         capture_output=True, text=True, encoding="utf-8", errors="replace", check=False,
     )
-    return done.returncode, (done.stdout + done.stderr).strip()
+    # strip() 을 하면 porcelain 첫 줄의 앞 공백(" M path")이 날아가 경로 첫 글자가 잘린다. 끝만 자른다.
+    return done.returncode, (done.stdout + done.stderr).rstrip()
 
 
 def state(config: Config) -> dict:
     rc, branch = _git(config, "rev-parse", "--abbrev-ref", "HEAD")
+    branch = branch.strip()
     _, dirty = _git(config, "status", "--porcelain", "--", CONTENT_DIR)
     _, ahead = _git(config, "rev-list", "--count", "@{u}..HEAD")
+    ahead = ahead.strip()
     return {
         "branch": branch if rc == 0 else None,
         "content_dirty": [line[3:] for line in dirty.splitlines() if line.strip()],
@@ -48,6 +51,7 @@ def publish(config: Config, message: str | None = None, push: bool = True) -> di
     if rc != 0:
         return {"published": False, "note": f"git commit 실패: {out}"}
     _, sha = _git(config, "rev-parse", "--short", "HEAD")
+    sha = sha.strip()
 
     pushed = False
     note = "커밋했다. push 는 하지 않았다."

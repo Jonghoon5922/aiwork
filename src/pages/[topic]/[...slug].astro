@@ -3,6 +3,7 @@ import { getCollection, render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import PostList from '../../components/PostList.astro';
 import Comments from '../../components/Comments.astro';
+import CopyScript from '../../components/CopyScript.astro';
 import { url, fmtDate, KIND_LABEL, byline } from '../../lib/site';
 
 // 글 파일은 src/content/posts/<topic>/<slug>.md 에 둔다. id 가 "topic/slug" 가 되어 그대로 주소가 된다.
@@ -99,6 +100,7 @@ const faq =
   </article>
 
   <Comments post={post.id} />
+  <CopyScript />
 
   {related.length > 0 && (
     <section class="related">
@@ -107,25 +109,3 @@ const faq =
     </section>
   )}
 </Base>
-
-<script>
-  // 코드 블록마다 복사 버튼. 이 사이트의 핵심은 프롬프트를 그대로 가져가는 것이다.
-  document.querySelectorAll<HTMLPreElement>('.prose pre').forEach((pre) => {
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'copy-btn';
-    btn.textContent = '복사';
-    btn.addEventListener('click', async () => {
-      const text = pre.querySelector('code')?.innerText ?? pre.innerText;
-      try {
-        await navigator.clipboard.writeText(text);
-        btn.textContent = '복사했어요';
-        btn.classList.add('done');
-        setTimeout(() => { btn.textContent = '복사'; btn.classList.remove('done'); }, 1600);
-      } catch {
-        btn.textContent = '복사 실패';
-      }
-    });
-    pre.appendChild(btn);
-  });
-</script>

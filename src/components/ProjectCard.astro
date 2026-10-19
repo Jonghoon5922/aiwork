@@ -1,0 +1,34 @@
+---
+// 만든 것 카드 하나. 종류 배지, 부모 표시, "어떻게 쓰나" 한 줄과 복사 버튼.
+import type { CollectionEntry } from 'astro:content';
+import { PROJECT_TYPE_LABEL } from '../content.config';
+import { url } from '../lib/site';
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+  parentName?: string;
+  postCount?: number;
+}
+const { project, parentName, postCount = 0 } = Astro.props;
+const d = project.data;
+---
+
+<li class="card project-card">
+  <div class="badges">
+    <span class="badge on">{PROJECT_TYPE_LABEL[d.type]}</span>
+    <span class="badge">{d.status}</span>
+    {parentName && <span class="badge">{parentName}의 일부</span>}
+  </div>
+  <h3><a href={url(`/projects/${project.id}`)}>{d.name}</a></h3>
+  <p>{d.summary}</p>
+  {d.usage && (
+    <div class="usage">
+      <code>{d.usage}</code>
+      <button type="button" class="copy-btn inline" data-copy={d.usage}>복사</button>
+    </div>
+  )}
+  <div class="card-foot">
+    <span class="count">{postCount > 0 ? `글 ${postCount}편` : '소개 글 준비 중'}</span>
+    {d.url && <a class="link" href={d.url}>{d.url.replace(/^https?:\/\//, '')} ↗</a>}
+  </div>
+</li>

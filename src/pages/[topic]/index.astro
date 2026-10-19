@@ -2,6 +2,9 @@
 import { getCollection, render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import PostList from '../../components/PostList.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+import CopyScript from '../../components/CopyScript.astro';
+import { PROJECT_TYPES, PROJECT_TYPE_LABEL } from '../../content.config';
 import { url, fmtDate } from '../../lib/site';
 
 export async function getStaticPaths() {
@@ -16,16 +19,21 @@ const posts = (await getCollection('posts', ({ data }) => !data.draft && data.to
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 
 const series = posts
-  .filter((p) => p.data.kind === 'workbook')
+  .filter((p) => p.data.kind === 'workbook' || p.data.kind === 'journal')
   .sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0));
-const others = posts.filter((p) => p.data.kind !== 'workbook');
+const others = posts.filter((p) => p.data.kind !== 'workbook' && p.data.kind !== 'journal');
 const audiences = [...new Set(others.map((p) => p.data.audience).filter(Boolean))] as string[];
 
-const projects =
-  topic.id === 'made'
-    ? (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order)
-    : [];
-const postCountOf = (slug: string) => posts.filter((p) => p.data.project === slug).length;
+// "만든 것들" 은 종류별 섹션으로 카드를 보여 준다.
+const projects = topic.id === 'made'
+  ? (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order)
+  : [];
+const nameOf = (slug?: string) => projects.find((p) => p.id === slug)?.data.name;
+const allPosts = topic.id === 'made' ? await getCollection('posts', ({ data }) => !data.draft) : [];
+const postCountOf = (slug: string) => allPosts.filter((p) => p.data.project === slug).length;
+const sections = PROJECT_TYPES
+  .map((type) => ({ type, label: PROJECT_TYPE_LABEL[type], items: projects.filter((p) => p.data.type === type) }))
+  .filter((s) => s.items.length > 0);
 ---
 
 <Base title={topic.data.name} description={topic.data.summary}>
@@ -33,26 +41,16 @@ const postCountOf = (slug: string) => posts.filter((p) => p.data.project === slu
   <p class="lede">{topic.data.summary}</p>
   <div class="prose"><Content /></div>
 
-  {projects.length > 0 && (
+  {sections.map((s) => (
     <>
-      <div class="section-head"><h2>프로젝트</h2></div>
+      <div class="section-head"><h2>{s.label}</h2><span>{s.items.length}개</span></div>
       <ul class="cards">
-        {projects.map((p) => (
-          <li>
-            <a class="card" href={url(`/projects/${p.id}`)}>
-              <h3>{p.data.name}</h3>
-              <p>{p.data.summary}</p>
-              <div class="badges" style="margin-top:12px">
-                <span class="badge on">{p.data.status}</span>
-                {p.data.stack.slice(0, 3).map((s) => <span class="badge">{s}</span>)}
-              </div>
-              <span class="count">{postCountOf(p.id) > 0 ? `글 ${postCountOf(p.id)}편` : '소개 글 준비 중'}</span>
-            </a>
-          </li>
+        {s.items.map((p) => (
+          <ProjectCard project={p} parentName={nameOf(p.data.parent)} postCount={postCountOf(p.id)} />
         ))}
       </ul>
     </>
-  )}
+  ))}
 
   {series.length > 0 && (
     <>
@@ -73,7 +71,9 @@ const postCountOf = (slug: string) => posts.filter((p) => p.data.project === slu
     </>
   )}
 
-  <div class="section-head"><h2>{topic.id === 'ai-biseo' ? '직군별 사례' : '글'}</h2></div>
+  {(others.length > 0 || series.length === 0) && (
+    <div class="section-head"><h2>{topic.id === 'ai-biseo' ? '직군별 사례' : '글'}</h2></div>
+  )}
   {others.length === 0 && series.length === 0 ? (
     <p class="empty">아직 글이 없어요. 주 1회 올라와요.</p>
   ) : others.length === 0 ? null : (
@@ -87,6 +87,7 @@ const postCountOf = (slug: string) => posts.filter((p) => p.data.project === slu
       <PostList posts={others} filterable />
     </>
   )}
+  <CopyScript />
 </Base>
 
 <script>

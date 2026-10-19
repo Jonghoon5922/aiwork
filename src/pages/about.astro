@@ -1,0 +1,40 @@
+---
+import { getEntry, render } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import CopyScript from '../components/CopyScript.astro';
+import { fmtDate } from '../lib/site';
+
+const page = await getEntry('pages', 'about');
+if (!page) throw new Error('src/content/pages/about.md 가 없다');
+const { Content } = await render(page);
+const faq =
+  page.data.faq.length > 0
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: page.data.faq.map((f) => ({
+          '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a },
+        })),
+      }
+    : null;
+---
+
+<Base title={page.data.title} description={page.data.summary}>
+  {faq && <script type="application/ld+json" set:html={JSON.stringify(faq)} />}
+  <article>
+    <h1>{page.data.title}</h1>
+    <p class="lede">{page.data.summary}</p>
+    <div class="prose"><Content /></div>
+
+    {page.data.faq.length > 0 && (
+      <section class="faq">
+        <h2>자주 묻는 것</h2>
+        {page.data.faq.map((f) => (
+          <details><summary>{f.q}</summary><p>{f.a}</p></details>
+        ))}
+      </section>
+    )}
+    {page.data.updated && <p class="meta" style="margin-top:28px">마지막 수정 {fmtDate(page.data.updated)}</p>}
+  </article>
+  <CopyScript />
+</Base>

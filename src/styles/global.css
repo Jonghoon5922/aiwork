@@ -85,6 +85,21 @@ h3 { font-size: 17.5px; margin: 28px 0 8px; font-weight: 700; }
 .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
 .btn.primary:hover { filter: brightness(1.05); }
 
+/* ── 홈 입구 ──────────────────────────────────────────── */
+.entrances { list-style: none; padding: 0; margin: 8px 0 0; display: grid; gap: 12px; }
+.entrance {
+  display: grid; grid-template-columns: 1fr auto; grid-template-areas: "who count" "name count" "what count";
+  gap: 2px 16px; align-items: center;
+  padding: 18px 20px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--card);
+  transition: border-color .15s, transform .15s;
+}
+.entrance:hover { border-color: var(--accent); text-decoration: none; transform: translateY(-1px); }
+.entrance .who { grid-area: who; color: var(--muted); font-size: 13.5px; }
+.entrance .name { grid-area: name; font-weight: 800; font-size: 21px; letter-spacing: -0.02em; }
+.entrance .what { grid-area: what; color: var(--muted); font-size: 14.5px; }
+.entrance .count { grid-area: count; color: var(--accent); font-weight: 600; font-size: 13px; white-space: nowrap; }
+.entrance.muted .name { font-size: 17px; }
+
 /* ── 카드 ─────────────────────────────────────────────── */
 .cards { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); padding: 0; list-style: none; margin: 0; }
 .card {
@@ -97,6 +112,19 @@ h3 { font-size: 17.5px; margin: 28px 0 8px; font-weight: 700; }
 .card h3 { margin: 0 0 6px; font-size: 17px; }
 .card p { margin: 0; color: var(--muted); font-size: 14.5px; line-height: 1.65; }
 .card .count { display: inline-block; margin-top: 12px; font-size: 12.5px; color: var(--accent); font-weight: 600; }
+
+.project-card { display: flex; flex-direction: column; gap: 8px; }
+.project-card h3 { margin: 2px 0 0; }
+.project-card .badges { margin: 0; }
+.project-card .card-foot { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-top: auto; padding-top: 6px; }
+.project-card .card-foot .count { margin-top: 0; }
+.project-card .link { color: var(--muted); font-size: 13px; }
+.usage { display: flex; align-items: center; gap: 8px; background: var(--code-bg); border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px 6px 10px; }
+.usage code { font-family: "D2Coding", ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 12.5px; overflow-x: auto; white-space: nowrap; flex: 1; }
+.usage.big { padding: 10px 12px; margin: 0 0 24px; }
+.usage.big code { font-size: 14px; }
+.usage .label { color: var(--muted); font-size: 13px; white-space: nowrap; }
+.copy-btn.inline { position: static; opacity: 1; flex: none; }
 
 /* ── 글 목록 ──────────────────────────────────────────── */
 .posts { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }

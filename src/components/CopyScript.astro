@@ -1,0 +1,29 @@
+---
+// 복사 버튼 한 벌. 이 사이트의 핵심은 프롬프트와 설치 명령을 그대로 가져가는 것이다.
+//  - .prose pre 마다 버튼을 붙인다
+//  - button[data-copy] 는 data-copy 의 값을 복사한다
+---
+<script>
+  async function copy(text: string, btn: HTMLButtonElement) {
+    const label = btn.textContent;
+    try {
+      await navigator.clipboard.writeText(text);
+      btn.textContent = '복사했어요';
+      btn.classList.add('done');
+    } catch {
+      btn.textContent = '복사 실패';
+    }
+    setTimeout(() => { btn.textContent = label; btn.classList.remove('done'); }, 1600);
+  }
+  document.querySelectorAll<HTMLPreElement>('.prose pre').forEach((pre) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'copy-btn';
+    btn.textContent = '복사';
+    btn.addEventListener('click', () => copy(pre.querySelector('code')?.innerText ?? pre.innerText, btn));
+    pre.appendChild(btn);
+  });
+  document.querySelectorAll<HTMLButtonElement>('button[data-copy]').forEach((btn) => {
+    btn.addEventListener('click', () => copy(btn.dataset.copy ?? '', btn));
+  });
+</script>

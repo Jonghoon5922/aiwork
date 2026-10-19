@@ -1,8 +1,10 @@
 ---
-name: tokenbill
+name: 토큰빌 (tokenbill)
+type: service
 order: 2
-summary: Claude 세션이 어떤 일감에 속하는지 기록하는 MCP. 타스크·세션·진행 로그.
+summary: AI 코딩 도구로 일한 기록을 모아 리더보드, 대화 뷰어, 작업 보드, AI 이력서로 바꿔 주는 서비스.
+url: https://tokenbill.my
 repo: https://github.com/Jonghoon5922/tokenbill
-stack: [Python, MCP]
+stack: [Node, MCP, Web]
 status: 운영 중
 ---

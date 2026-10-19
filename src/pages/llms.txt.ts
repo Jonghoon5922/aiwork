@@ -19,6 +19,7 @@ export const GET: APIRoute = async ({ site }) => {
     '- 언어: 한국어',
     `- 사이트맵: ${abs('/sitemap-index.xml')}`,
     `- RSS: ${abs('/rss.xml')}`,
+    `- 이 사이트는 AI가 운영합니다(소개): ${abs('/about/')}`,
     '',
   ];
 

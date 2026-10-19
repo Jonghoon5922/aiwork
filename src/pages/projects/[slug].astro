@@ -2,6 +2,9 @@
 import { getCollection, render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import PostList from '../../components/PostList.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+import CopyScript from '../../components/CopyScript.astro';
+import { PROJECT_TYPE_LABEL } from '../../content.config';
 import { url } from '../../lib/site';
 
 export async function getStaticPaths() {
@@ -10,26 +13,55 @@ export async function getStaticPaths() {
 }
 
 const { project } = Astro.props;
+const d = project.data;
 const { Content } = await render(project);
-const posts = (await getCollection('posts', ({ data }) => !data.draft && data.project === project.id))
-  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const all = await getCollection('projects');
+const parent = d.parent ? all.find((p) => p.id === d.parent) : undefined;
+const children = all.filter((p) => p.data.parent === project.id).sort((a, b) => a.data.order - b.data.order);
+const allPosts = await getCollection('posts', ({ data }) => !data.draft);
+const posts = allPosts.filter((p) => p.data.project === project.id).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const postCountOf = (slug: string) => allPosts.filter((p) => p.data.project === slug).length;
 ---
 
-<Base title={project.data.name} description={project.data.summary}>
-  <div class="meta" style="margin:0 0 10px"><a href={url('/made')}>만든 것들</a></div>
-  <h1>{project.data.name}</h1>
-  <p class="lede">{project.data.summary}</p>
-  <div class="badges" style="margin-bottom:24px">
-    <span class="badge on">{project.data.status}</span>
-    {project.data.stack.map((s) => <span class="badge">{s}</span>)}
-    {project.data.repo && <a class="badge" href={project.data.repo}>저장소 ↗</a>}
+<Base title={d.name} description={d.summary}>
+  <div class="meta" style="margin:0 0 10px">
+    <a href={url('/made')}>만든 것들</a>
+    {parent && <><span class="dot"></span><a href={url(`/projects/${parent.id}`)}>{parent.data.name}</a></>}
   </div>
+  <h1>{d.name}</h1>
+  <p class="lede">{d.summary}</p>
+  <div class="badges" style="margin-bottom:18px">
+    <span class="badge on">{PROJECT_TYPE_LABEL[d.type]}</span>
+    <span class="badge">{d.status}</span>
+    {d.stack.map((s) => <span class="badge">{s}</span>)}
+    {d.url && <a class="badge" href={d.url}>{d.url.replace(/^https?:\/\//, '')} ↗</a>}
+    {d.repo && <a class="badge" href={d.repo}>저장소 ↗</a>}
+  </div>
+  {d.usage && (
+    <div class="usage big">
+      <span class="label">어떻게 쓰나</span>
+      <code>{d.usage}</code>
+      <button type="button" class="copy-btn inline" data-copy={d.usage}>복사</button>
+    </div>
+  )}
   <div class="prose"><Content /></div>
+
+  {children.length > 0 && (
+    <>
+      <div class="section-head"><h2>함께 가는 것</h2></div>
+      <ul class="cards">
+        {children.map((c) => <ProjectCard project={c} parentName={d.name} postCount={postCountOf(c.id)} />)}
+      </ul>
+    </>
+  )}
 
   <div class="section-head"><h2>이 프로젝트의 글</h2></div>
   {posts.length === 0 ? (
-    <p class="empty">아직 글이 없어요. 소개 글부터 올라와요.</p>
+    <p class="empty">
+      아직 글이 없어요.{parent && <> 지금은 <a href={url(`/projects/${parent.id}`)}>{parent.data.name}</a>의 글에 함께 다뤄요.</>}
+    </p>
   ) : (
     <PostList posts={posts} />
   )}
+  <CopyScript />
 </Base>

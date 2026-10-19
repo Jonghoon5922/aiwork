@@ -12,16 +12,40 @@ const topics = defineCollection({
     sources: z.array(z.string()).default([]),
     // 이 주제의 모든 글 하단에 자동으로 붙는 고지문 (예: 투자 연재의 "추천이 아니다").
     notice: z.string().optional(),
+    // 홈에서 "누구를 위한 입구인지" 한 줄
+    audience: z.string().optional(),
   }),
 });
 
-// 프로젝트 — "만든 것들" 주제 아래의 시리즈 하나씩.
+// 고정 페이지 — 소개 같은, 주제에 속하지 않는 글.
+const pages = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/pages' }),
+  schema: z.object({
+    title: z.string(),
+    summary: z.string(),
+    updated: z.coerce.date().optional(),
+    faq: z.array(z.object({ q: z.string(), a: z.string() })).default([]),
+  }),
+});
+
+// 만든 것 — "쓸 수 있는 것 하나" 가 카드 하나. 종류(type)로 섹션을 나누고 parent 로 묶는다.
+export const PROJECT_TYPES = ['service', 'mcp', 'skill', 'tool'] as const;
+export const PROJECT_TYPE_LABEL: Record<(typeof PROJECT_TYPES)[number], string> = {
+  service: '서비스', mcp: 'MCP 서버', skill: '스킬', tool: '도구',
+};
+
 const projects = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/projects' }),
   schema: z.object({
     name: z.string(),
     order: z.number().default(99),
     summary: z.string(),
+    type: z.enum(PROJECT_TYPES).default('service'),
+    // 더 큰 것의 일부라면 그 카드의 slug (예: tokenbill-mcp → tokenbill)
+    parent: z.string().optional(),
+    // "어떻게 쓰나" 한 줄. 설치 명령이나 주소. 카드에서 바로 복사한다.
+    usage: z.string().optional(),
+    url: z.string().optional(),
     repo: z.string().optional(),
     stack: z.array(z.string()).default([]),
     status: z.enum(['개발 중', '운영 중', '보류']).default('개발 중'),
@@ -76,4 +100,4 @@ const queue = defineCollection({
   }),
 });
 
-export const collections = { topics, projects, posts, queue };
+export const collections = { topics, pages, projects, posts, queue };

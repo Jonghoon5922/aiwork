@@ -1,8 +1,10 @@
 ---
-name: aicv
-order: 3
-summary: AI와 일한 흔적으로 이력서를 만드는 도구.
+name: AICV
+type: service
+parent: tokenbill
+order: 4
+summary: 작업 로그가 근거가 되는 AI 활용 이력서. 토큰빌 기능으로 통합하는 중.
 repo: https://github.com/Jonghoon5922/aicv
-stack: [Python, MCP]
-status: 개발 중
+stack: [Node, Web]
+status: 보류
 ---

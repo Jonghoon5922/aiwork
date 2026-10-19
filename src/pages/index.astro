@@ -8,8 +8,10 @@ const topics = (await getCollection('topics')).sort((a, b) => a.data.order - b.d
 const allPosts = (await getCollection('posts', ({ data }) => !data.draft)).sort(
   (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
 );
-const recent = allPosts.slice(0, 8);
 const countBy = (id: string) => allPosts.filter((p) => p.data.topic === id).length;
+// 입구는 글이 있는 주제만. 빈 방은 보여 주지 않는다.
+const entrances = topics.filter((t) => countBy(t.id) > 0);
+const recent = allPosts.slice(0, 8);
 const topicName = (id: string) => topics.find((t) => t.id === id)?.data.name ?? id;
 ---
 
@@ -18,25 +20,28 @@ const topicName = (id: string) => topics.find((t) => t.id === id)?.data.name ?? 
     <h1>{SITE_TAGLINE}</h1>
     <p>
       직군이 무엇이든 AI를 내 일에 끌어다 쓰는 법, 그리고 AI와 직접 만든 것들의 기록이에요.
-      프롬프트와 확인 항목은 그대로 복사해서 쓰면 돼요.
+      프롬프트와 설치 명령은 그대로 복사해서 쓰면 돼요. 글은 Claude가 쓰고 검사를 거쳐 자동으로 올라와요.
     </p>
-    <div class="cta">
-      <a class="btn primary" href={url('/ai-biseo')}>AI 업무 비서 시작하기</a>
-      <a class="btn" href={url('/made')}>만든 것들 보기</a>
-    </div>
   </section>
 
-  <div class="section-head"><h2>주제</h2></div>
-  <ul class="cards">
-    {topics.map((t) => (
+  <ul class="entrances">
+    {entrances.map((t) => (
       <li>
-        <a class="card" href={url(`/${t.id}`)}>
-          <h3>{t.data.name}</h3>
-          <p>{t.data.summary}</p>
-          <span class="count">{countBy(t.id) > 0 ? `글 ${countBy(t.id)}편` : '준비 중'}</span>
+        <a class="entrance" href={url(`/${t.id}`)}>
+          {t.data.audience && <span class="who">{t.data.audience}</span>}
+          <span class="name">{t.data.name} →</span>
+          <span class="what">{t.data.summary}</span>
+          <span class="count">글 {countBy(t.id)}편</span>
         </a>
       </li>
     ))}
+    <li>
+      <a class="entrance muted" href={url('/about')}>
+        <span class="who">이 사이트가 궁금하면</span>
+        <span class="name">소개 →</span>
+        <span class="what">글은 Claude가 쓰고, 검사를 거쳐 자동으로 게시돼요. 사람은 경험담을 채우고 가끔 글을 내려요.</span>
+      </a>
+    </li>
   </ul>
 
   <div class="section-head">

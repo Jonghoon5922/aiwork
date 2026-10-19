@@ -6,5 +6,7 @@ import sitemap from '@astrojs/sitemap';
 export default defineConfig({
   site: 'https://aihago.com',
   trailingSlash: 'never',
+  // GitHub Pages 는 /x 를 /x/ 로 301 하므로 x.html 로 뽑아 리다이렉트 없이 바로 서빙되게 한다.
+  build: { format: 'file' },
   integrations: [sitemap()],
 });

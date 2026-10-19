@@ -29,7 +29,7 @@ export const fmtDate = (d: Date) =>
 export const KIND_LABEL: Record<string, string> = {
   workbook: '워크북',
   case: '사례',
-  intro: '소개',
+  intro: '설계',
   devlog: '개발 일지',
   decision: '결정 기록',
   release: '릴리즈',

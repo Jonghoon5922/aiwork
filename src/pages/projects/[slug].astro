@@ -5,7 +5,7 @@ import PostList from '../../components/PostList.astro';
 import ProjectCard from '../../components/ProjectCard.astro';
 import CopyScript from '../../components/CopyScript.astro';
 import { PROJECT_TYPE_LABEL } from '../../content.config';
-import { url } from '../../lib/site';
+import { url, fmtDate, KIND_LABEL } from '../../lib/site';
 
 export async function getStaticPaths() {
   const projects = await getCollection('projects');
@@ -19,7 +19,8 @@ const all = await getCollection('projects');
 const parent = d.parent ? all.find((p) => p.id === d.parent) : undefined;
 const children = all.filter((p) => p.data.parent === project.id).sort((a, b) => a.data.order - b.data.order);
 const allPosts = await getCollection('posts', ({ data }) => !data.draft);
-const posts = allPosts.filter((p) => p.data.project === project.id).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+// 연재는 1편부터 읽는다: 설계 → 단계별 진행 → 결정 → 릴리즈. 오래된 순.
+const posts = allPosts.filter((p) => p.data.project === project.id).sort((a, b) => a.data.date.valueOf() - b.data.date.valueOf());
 const postCountOf = (slug: string) => allPosts.filter((p) => p.data.project === slug).length;
 ---
 
@@ -55,13 +56,25 @@ const postCountOf = (slug: string) => allPosts.filter((p) => p.data.project === 
     </>
   )}
 
-  <div class="section-head"><h2>이 프로젝트의 글</h2></div>
+  <div class="section-head"><h2>연재</h2>{posts.length > 0 && <span>설계부터 순서대로, {posts.length}편</span>}</div>
   {posts.length === 0 ? (
     <p class="empty">
-      아직 글이 없어요.{parent && <> 지금은 <a href={url(`/projects/${parent.id}`)}>{parent.data.name}</a>의 글에 함께 다뤄요.</>}
+      아직 글이 없어요. 첫 글은 설계 글이에요.{parent && <> 지금은 <a href={url(`/projects/${parent.id}`)}>{parent.data.name}</a>의 연재에 함께 다뤄요.</>}
     </p>
   ) : (
-    <PostList posts={posts} />
+    <ol class="series">
+      {posts.map((post) => (
+        <li>
+          <a class="post-row" href={url(`/${post.id}`)}>
+            <span>
+              <span class="title">{post.data.title}</span>
+              <p class="summary">{post.data.summary}</p>
+              <div class="meta"><span class="badge on">{KIND_LABEL[post.data.kind]}</span><span>{fmtDate(post.data.date)}</span></div>
+            </span>
+          </a>
+        </li>
+      ))}
+    </ol>
   )}
   <CopyScript />
 </Base>

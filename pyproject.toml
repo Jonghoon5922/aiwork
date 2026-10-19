@@ -1,0 +1,43 @@
+[project]
+name = "aiwork-mcp"
+dynamic = ["version"]
+description = "AI 활용·개발 글이 주제별로 쌓이는 공개 사이트를 사람 손 없이 운영하는 로컬 MCP 서버"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+authors = [{ name = "Jonghoon5922" }]
+keywords = ["mcp", "blog", "astro", "claude"]
+
+dependencies = [
+    # MCP 2.x 에서 FastMCP 가 MCPServer 로 개명됐다. 1.x 가 깔리면 import 부터 실패한다.
+    "mcp>=2.0",
+    "typer>=0.15",
+    "rich>=13.9",
+    "pyyaml>=6.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/Jonghoon5922/aiwork"
+
+[project.scripts]
+aiwork = "aiwork.cli:app"
+
+[dependency-groups]
+dev = ["pytest>=8.3"]
+
+[tool.hatch.version]
+path = "aiwork/__init__.py"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+# src/ 는 Astro 가 쓴다. 파이썬 패키지는 최상위 aiwork/ 하나뿐이다.
+[tool.hatch.build.targets.wheel]
+packages = ["aiwork"]
+
+[tool.hatch.build.targets.sdist]
+include = ["aiwork", "tests", "pyproject.toml"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

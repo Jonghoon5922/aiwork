@@ -1,8 +1,8 @@
 // 사이트 공통 상수와 링크 도우미.
 // base 가 있든 없든(커스텀 도메인 전·후) 링크가 깨지지 않게 모든 내부 링크는 url() 을 거친다.
 
-export const SITE_NAME = 'aiwork'; // 사이트 이름 미정 — 정해지면 여기만 바꾼다
-export const SITE_TAGLINE = 'AI로 일하고, AI로 만들고, AI가 기록하는 곳';
+export const SITE_NAME = 'AI하고'; // 도메인 aihago.com (구매 대기)
+export const SITE_TAGLINE = 'AI하고 일하고, AI하고 만들어요';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 

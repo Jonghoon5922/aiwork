@@ -87,6 +87,7 @@ const faq =
       </section>
     )}
 
+    {topic?.data.notice && <p class="notice">{topic.data.notice}</p>}
     <p class="byline">{byline(post.data.materials)}</p>
 
     {(prev || next) && (

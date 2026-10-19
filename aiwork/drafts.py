@@ -17,7 +17,7 @@ import yaml
 from . import check, collect, content
 from .config import AccessDenied, Config
 
-KINDS = ("workbook", "case", "intro", "devlog", "decision", "release")
+KINDS = ("workbook", "case", "intro", "devlog", "decision", "release", "journal")
 
 _SLUG_STRIP = re.compile(r"[^0-9A-Za-z가-힣\s-]")
 _SLUG_SPACE = re.compile(r"\s+")
@@ -59,7 +59,7 @@ def save_draft(config: Config, topic: str, kind: str, title: str, body: str, sum
     _validate_topic(config, topic)
     if kind not in KINDS:
         raise AccessDenied(f"kind 는 {', '.join(KINDS)} 중 하나다.")
-    if kind in ("intro", "devlog", "decision", "release"):
+    if kind in ("intro", "devlog", "decision", "release", "journal"):
         if not project:
             raise AccessDenied(f"kind={kind} 는 project 가 필요하다.")
         proj = config.project(project)
@@ -68,8 +68,8 @@ def save_draft(config: Config, topic: str, kind: str, title: str, body: str, sum
             until_commit = collect.head(proj)
     if kind == "case" and not audience:
         raise AccessDenied("kind=case 는 audience(직군) 가 필요하다.")
-    if kind == "workbook" and (series is None or order is None):
-        raise AccessDenied("kind=workbook 은 series 와 order 가 필요하다.")
+    if kind in ("workbook", "journal") and (series is None or order is None):
+        raise AccessDenied(f"kind={kind} 은 series 와 order 가 필요하다.")
 
     slug = slug or make_slug(title)
     path = config.site.drafts / topic / f"{slug}.md"

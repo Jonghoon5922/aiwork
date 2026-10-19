@@ -44,6 +44,7 @@ def gather(config: Config, min_commits: int = MIN_COMMITS, sample: int = 15) -> 
     now = datetime.now(timezone.utc).isoformat(timespec="seconds")
 
     # 1. 프로젝트
+    cards = {c["slug"]: c for c in content.list_project_cards(config)}
     ready, skipped = [], []
     for project in config.projects:
         if not project.public or not collect.is_repo(project.path):
@@ -60,6 +61,9 @@ def gather(config: Config, min_commits: int = MIN_COMMITS, sample: int = 15) -> 
             "project": project.name, "since": since,
             "last_post": {"title": last.title, "date": last.date.isoformat() if last.date else None} if last else None,
             "suggested_kind": "devlog" if last else "intro",
+            # 글이 가는 주제와 연재 이름. 카드에 topic 이 있으면 그쪽(장기 연재), 없으면 made.
+            "topic": cards.get(project.name, {}).get("topic", "made"),
+            "series": cards.get(project.name, {}).get("series"),
             "commits_since": n, "head": collect.head(project),
             "recent": [{"hash": c["hash"], "date": c["date"][:10], "subject": c["subject"]} for c in changes["commits"]],
             "docs": collect.list_docs(project),

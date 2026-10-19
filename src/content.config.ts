@@ -10,6 +10,8 @@ const topics = defineCollection({
     summary: z.string(),
     // 이 주제의 글이 어디서 나오는지. "이 사이트는 AI가 운영합니다" 글의 재료이기도 하다.
     sources: z.array(z.string()).default([]),
+    // 이 주제의 모든 글 하단에 자동으로 붙는 고지문 (예: 투자 연재의 "추천이 아니다").
+    notice: z.string().optional(),
   }),
 });
 
@@ -23,11 +25,15 @@ const projects = defineCollection({
     repo: z.string().optional(),
     stack: z.array(z.string()).default([]),
     status: z.enum(['개발 중', '운영 중', '보류']).default('개발 중'),
+    // 이 프로젝트의 글이 가는 주제. 비우면 "만든 것들"(made). 장기 연재는 자기 주제를 가진다.
+    topic: z.string().default('made'),
+    // 연재 이름(있으면 글에 series 로 붙는다)
+    series: z.string().optional(),
   }),
 });
 
 // 글 — 프론트매터가 곧 상태 저장소다 (SPEC 7절).
-export const KINDS = ['workbook', 'case', 'intro', 'devlog', 'decision', 'release'] as const;
+export const KINDS = ['workbook', 'case', 'intro', 'devlog', 'decision', 'release', 'journal'] as const;
 
 const posts = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/posts' }),

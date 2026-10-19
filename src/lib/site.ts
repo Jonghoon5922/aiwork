@@ -33,6 +33,7 @@ export const KIND_LABEL: Record<string, string> = {
   devlog: '개발 일지',
   decision: '결정 기록',
   release: '릴리즈',
+  journal: '회차',
 };
 
 // 글 하단 고정 문구 (SPEC 3절). 숨길 일이 아니라 이 사이트의 차별점이다.

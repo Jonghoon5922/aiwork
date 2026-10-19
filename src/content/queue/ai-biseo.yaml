@@ -4,7 +4,7 @@
   audience: 인사 담당자
   task: 직원 제도 문의 답변
   question: 인사팀인데 직원 문의 답변에 AI를 어떻게 쓰나요
-  status: 대기
+  status: 게시
   source: 워크북 3~6일차 주 사례
 - id: hr-job-posting
   audience: 인사 담당자

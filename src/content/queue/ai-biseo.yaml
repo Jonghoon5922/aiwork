@@ -10,7 +10,7 @@
   audience: 인사 담당자
   task: 채용 공고 문안
   question: 채용 공고를 AI로 쓰면 어디까지 믿어도 되나요
-  status: 대기
+  status: 게시
 - id: hr-interview-questions
   audience: 인사 담당자
   task: 면접 질문지 직무별 수정

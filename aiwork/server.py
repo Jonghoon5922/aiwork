@@ -70,7 +70,7 @@ def create_server(config: Config) -> MCPServer:
         return content.list_topics(config)
 
     @server.tool(name="list_posts", description=(
-        "글과 초안 목록. topic·kind(workbook/case/intro/devlog/decision/release/journal)·project·"
+        "글과 초안 목록. topic·kind(workbook/case/analysis/design/build/test/deploy/operate/decision/journal)·project·"
         "status(draft/published/unpublished) 로 거른다."
     ))
     def list_posts_tool(topic: str | None = None, kind: str | None = None,
@@ -141,7 +141,7 @@ def create_server(config: Config) -> MCPServer:
 
     @server.tool(name="save_draft", description=(
         "초안을 drafts/<topic>/ 에 저장하고 곧바로 마스킹 검사를 돌려 결과를 돌려준다. "
-        "kind 는 workbook/case/intro/devlog/decision/release/journal. case 는 audience, workbook·journal 은 series·order, "
+        "kind 는 workbook/case, 프로젝트 글은 개발 주기 단계 analysis/design/build/test/deploy/operate, 보조로 decision, 정기 회차 journal. case 는 audience, workbook·journal 은 series·order, "
         "프로젝트 글(intro/devlog/decision/release)은 project 가 필요하고 until_commit 을 비우면 현재 HEAD 로 박는다. "
         "question 은 사람이 검색창이나 AI 에 실제로 치는 문장. materials 는 글 하단 고정 문구에 들어가는 재료 설명. "
         "큐에서 꺼낸 글이면 queue_id 를 넣는다 — approve 때 큐 상태가 '게시' 로 바뀐다. 초안은 저장소에 올라가지 않는다."

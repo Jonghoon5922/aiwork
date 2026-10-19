@@ -57,7 +57,12 @@ const projects = defineCollection({
 });
 
 // 글 — 프론트매터가 곧 상태 저장소다 (SPEC 7절).
-export const KINDS = ['workbook', 'case', 'intro', 'devlog', 'decision', 'release', 'journal'] as const;
+// 프로젝트 글은 교육 자료의 개발 주기 여섯 단계를 그대로 따른다: 분석 → 설계 → 개발 → 테스트 → 배포 → 운영.
+export const STAGES = ['analysis', 'design', 'build', 'test', 'deploy', 'operate'] as const;
+export const STAGE_LABEL: Record<(typeof STAGES)[number], string> = {
+  analysis: '분석', design: '설계', build: '개발', test: '테스트', deploy: '배포', operate: '운영',
+};
+export const KINDS = ['workbook', 'case', ...STAGES, 'decision', 'journal'] as const;
 
 const posts = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/posts' }),

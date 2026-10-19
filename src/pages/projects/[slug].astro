@@ -4,7 +4,7 @@ import Base from '../../layouts/Base.astro';
 import PostList from '../../components/PostList.astro';
 import ProjectCard from '../../components/ProjectCard.astro';
 import CopyScript from '../../components/CopyScript.astro';
-import { PROJECT_TYPE_LABEL } from '../../content.config';
+import { PROJECT_TYPE_LABEL, STAGES, STAGE_LABEL } from '../../content.config';
 import { url, fmtDate, KIND_LABEL } from '../../lib/site';
 
 export async function getStaticPaths() {
@@ -19,8 +19,13 @@ const all = await getCollection('projects');
 const parent = d.parent ? all.find((p) => p.id === d.parent) : undefined;
 const children = all.filter((p) => p.data.parent === project.id).sort((a, b) => a.data.order - b.data.order);
 const allPosts = await getCollection('posts', ({ data }) => !data.draft);
-// 연재는 1편부터 읽는다: 설계 → 단계별 진행 → 결정 → 릴리즈. 오래된 순.
-const posts = allPosts.filter((p) => p.data.project === project.id).sort((a, b) => a.data.date.valueOf() - b.data.date.valueOf());
+// 연재는 개발 주기 순서로 읽는다: 분석 → 설계 → 개발 → 테스트 → 배포 → 운영. 같은 단계 안에서는 오래된 순.
+const stageIndex = (k: string) => { const i = (STAGES as readonly string[]).indexOf(k); return i < 0 ? STAGES.length : i; };
+const posts = allPosts
+  .filter((p) => p.data.project === project.id)
+  .sort((a, b) => stageIndex(a.data.kind) - stageIndex(b.data.kind) || a.data.date.valueOf() - b.data.date.valueOf());
+const done = new Set(posts.map((p) => p.data.kind));
+const currentStage = STAGES.find((s) => !done.has(s));
 const postCountOf = (slug: string) => allPosts.filter((p) => p.data.project === slug).length;
 ---
 
@@ -56,10 +61,20 @@ const postCountOf = (slug: string) => allPosts.filter((p) => p.data.project === 
     </>
   )}
 
-  <div class="section-head"><h2>연재</h2>{posts.length > 0 && <span>설계부터 순서대로, {posts.length}편</span>}</div>
+  <div class="section-head"><h2>개발 주기</h2><span>분석부터 운영까지, 단계마다 한 편</span></div>
+  <ol class="stepper" aria-label="개발 주기 진행">
+    {STAGES.map((s) => (
+      <li class={done.has(s) ? 'done' : s === currentStage ? 'current' : ''}>
+        <span class="step-label">{STAGE_LABEL[s]}</span>
+        <span class="step-count">{posts.filter((p) => p.data.kind === s).length || ''}</span>
+      </li>
+    ))}
+  </ol>
+
+  <div class="section-head"><h2>연재</h2>{posts.length > 0 && <span>{posts.length}편</span>}</div>
   {posts.length === 0 ? (
     <p class="empty">
-      아직 글이 없어요. 첫 글은 설계 글이에요.{parent && <> 지금은 <a href={url(`/projects/${parent.id}`)}>{parent.data.name}</a>의 연재에 함께 다뤄요.</>}
+      아직 글이 없어요. 첫 글은 분석 글이에요.{parent && <> 지금은 <a href={url(`/projects/${parent.id}`)}>{parent.data.name}</a>의 연재에 함께 다뤄요.</>}
     </p>
   ) : (
     <ol class="series">

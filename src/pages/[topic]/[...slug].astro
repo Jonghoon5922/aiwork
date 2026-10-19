@@ -5,6 +5,7 @@ import PostList from '../../components/PostList.astro';
 import Comments from '../../components/Comments.astro';
 import CopyScript from '../../components/CopyScript.astro';
 import { url, fmtDate, KIND_LABEL, byline } from '../../lib/site';
+import { STAGES } from '../../content.config';
 
 // 글 파일은 src/content/posts/<topic>/<slug>.md 에 둔다. id 가 "topic/slug" 가 되어 그대로 주소가 된다.
 export async function getStaticPaths() {
@@ -26,7 +27,10 @@ const ordered =
   post.data.kind === 'workbook' || post.data.kind === 'journal'
     ? siblings.filter((p) => p.data.kind === post.data.kind && p.data.series === post.data.series).sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
     : post.data.project
-      ? siblings.filter((p) => p.data.project === post.data.project).sort((a, b) => a.data.date.valueOf() - b.data.date.valueOf())
+      ? siblings.filter((p) => p.data.project === post.data.project).sort((a, b) => {
+          const si = (k: string) => { const i = (STAGES as readonly string[]).indexOf(k); return i < 0 ? STAGES.length : i; };
+          return si(a.data.kind) - si(b.data.kind) || a.data.date.valueOf() - b.data.date.valueOf();
+        })
       : siblings.filter((p) => p.data.kind !== 'workbook' && p.data.kind !== 'journal').sort((a, b) => a.data.date.valueOf() - b.data.date.valueOf());
 const idx = ordered.findIndex((p) => p.id === post.id);
 const prev = idx > 0 ? ordered[idx - 1] : null;

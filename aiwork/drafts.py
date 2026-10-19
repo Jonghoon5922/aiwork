@@ -17,7 +17,8 @@ import yaml
 from . import check, collect, content
 from .config import AccessDenied, Config
 
-KINDS = ("workbook", "case", "intro", "devlog", "decision", "release", "journal")
+STAGES = ("analysis", "design", "build", "test", "deploy", "operate")
+KINDS = ("workbook", "case", *STAGES, "decision", "journal")
 
 _SLUG_STRIP = re.compile(r"[^0-9A-Za-z가-힣\s-]")
 _SLUG_SPACE = re.compile(r"\s+")
@@ -59,7 +60,7 @@ def save_draft(config: Config, topic: str, kind: str, title: str, body: str, sum
     _validate_topic(config, topic)
     if kind not in KINDS:
         raise AccessDenied(f"kind 는 {', '.join(KINDS)} 중 하나다.")
-    if kind in ("intro", "devlog", "decision", "release", "journal"):
+    if kind in (*STAGES, "decision", "journal"):
         if not project:
             raise AccessDenied(f"kind={kind} 는 project 가 필요하다.")
         proj = config.project(project)

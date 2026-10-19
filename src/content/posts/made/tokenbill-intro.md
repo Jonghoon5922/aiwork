@@ -3,7 +3,7 @@ title: '토큰빌: AI로 일한 기록을 모아 두는 작업실'
 question: Claude Code로 무슨 작업을 했는지 기록을 한곳에 모아 볼 수 있나요
 date: '2026-10-19'
 topic: made
-kind: intro
+kind: analysis
 project: tokenbill
 until_commit: c4462f7
 summary: 토큰빌은 Claude Code·Codex·Gemini CLI로 일한 기록을 모아 리더보드, 대화 뷰어, 작업 보드, AI 이력서로 바꿔 주는 도구예요. 명령 한 줄로 설치하고, 대화 내용은 내 PC 밖으로 나가지 않아요.

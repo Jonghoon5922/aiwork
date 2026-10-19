@@ -18,6 +18,17 @@ from . import check, collect, comments, content
 from .config import Config, config_dir
 
 MIN_COMMITS = 3
+STAGES = ("analysis", "design", "build", "test", "deploy", "operate")
+
+
+def _stage_posts(config: Config, project: str) -> dict:
+    mine = content.list_posts(config, project=project, status="published")
+    return {s: sum(1 for p in mine if p["kind"] == s) for s in STAGES}
+
+
+def _next_stage(config: Config, project: str) -> str:
+    counts = _stage_posts(config, project)
+    return next((s for s in STAGES if counts[s] == 0), "operate")
 STATE_FILE = "state.json"
 
 
@@ -60,7 +71,9 @@ def gather(config: Config, min_commits: int = MIN_COMMITS, sample: int = 15) -> 
         ready.append({
             "project": project.name, "since": since,
             "last_post": {"title": last.title, "date": last.date.isoformat() if last.date else None} if last else None,
-            "suggested_kind": "devlog" if last else "intro",
+            # 개발 주기에서 아직 글이 없는 첫 단계. 여섯 단계가 다 있으면 운영을 회차처럼 이어 간다.
+            "next_stage": _next_stage(config, project.name),
+            "stage_posts": _stage_posts(config, project.name),
             # 글이 가는 주제와 연재 이름. 카드에 topic 이 있으면 그쪽(장기 연재), 없으면 made.
             "topic": cards.get(project.name, {}).get("topic", "made"),
             "series": cards.get(project.name, {}).get("series"),

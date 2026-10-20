@@ -3,8 +3,8 @@ name: 7일 워크북
 type: content
 order: 0
 summary: 직군이 무엇이든 내 업무 하나를 AI 비서에게 넘겨 보는 7일 워크북. Claude와 네 번 고쳐 가며 만들었고, 그 과정도 연재한다.
-topic: ai-biseo
-url: https://aihago.com/ai-biseo/
+topic: ai-at-work
+url: https://aihago.com/ai-at-work/
 repo: https://github.com/Jonghoon5922/aiwork
 stack: [Markdown, Claude]
 status: 개발 중

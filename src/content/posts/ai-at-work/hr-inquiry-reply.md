@@ -2,7 +2,7 @@
 title: 인사 담당자가 직원 문의 답변을 AI 비서에게 넘기는 법
 question: 인사팀인데 직원 문의 답변에 AI를 어떻게 쓰나요
 date: '2026-10-19'
-topic: ai-biseo
+topic: ai-at-work
 kind: case
 audience: 인사 담당자
 summary: 규정 발췌 세 줄을 함께 넘기면 "규정에 따라 다릅니다"가 "최대 3일, 팀장 승인 후"로 바뀌어요. 직원 이름은 넣지 않고, 숫자는 보내기 전에 대조해요.

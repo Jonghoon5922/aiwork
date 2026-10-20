@@ -62,9 +62,74 @@ const sections = PROJECT_TYPES
     </>
   ))}
 
+  {topic.data.chapters.length > 0 && (
+    <>
+      <div class="section-head"><h2>차례</h2><span>하루 한 장, 순서대로</span></div>
+      <ol class="series toc">
+        {topic.data.chapters.map((title, i) => {
+          const post = series.find((p) => p.data.order === i + 1);
+          return post ? (
+            <li>
+              <a class="post-row" href={url(`/${post.id}`)}>
+                <span>
+                  <span class="title">{post.data.title}</span>
+                  <p class="summary">{post.data.summary}</p>
+                </span>
+              </a>
+            </li>
+          ) : (
+            <li>
+              <div class="post-row pending">
+                <span>
+                  <span class="title">{title}</span>
+                  <p class="summary">준비 중이에요. 저자 경험담이 채워지면 올라와요.</p>
+                </span>
+              </div>
+            </li>
+          );
+        })}
+      </ol>
+    </>
+  )}
+
+  {topic.data.chapters.length === 0 && series.length > 0 && (
+    <>
+      <div class="section-head"><h2>{series[0].data.series ?? '연재'}</h2><span>순서대로 읽어요</span></div>
+      <ol class="series">
+        {series.map((post) => (
+          <li>
+            <a class="post-row" href={url(`/${post.id}`)}>
+              <span>
+                <span class="title">{post.data.title}</span>
+                <p class="summary">{post.data.summary}</p>
+                <div class="meta"><span>{fmtDate(post.data.date)}</span></div>
+              </span>
+            </a>
+          </li>
+        ))}
+      </ol>
+    </>
+  )}
+
+  {(others.length > 0 || (series.length === 0 && topic.data.chapters.length === 0)) && (
+    <div class="section-head"><h2>{topic.id === 'ai-at-work' ? '직군별 사례' : '글'}</h2>{topic.id === 'ai-at-work' && <span>같은 절차를 실제 업무에 적용한 예</span>}</div>
+  )}
+  {others.length === 0 && series.length === 0 && topic.data.chapters.length === 0 ? (
+    <p class="empty">아직 글이 없어요. 주 1회 올라와요.</p>
+  ) : others.length === 0 ? null : (
+    <>
+      {audiences.length > 1 && (
+        <div class="chips" role="group" aria-label="직군 필터">
+          <button class="chip" aria-pressed="true" data-audience="">전체</button>
+          {audiences.map((a) => <button class="chip" aria-pressed="false" data-audience={a}>{a}</button>)}
+        </div>
+      )}
+      <PostList posts={others} filterable />
+    </>
+  )}
   {topic.id !== 'made' && (making.length > 0 || linkedProjects.length > 0) && (
     <>
-      <div class="section-head"><h2>이렇게 만들었어요</h2><span>왜 만들고, 어떻게 만들고, 돌려 보니 어떤가</span></div>
+      <div class="section-head"><h2>이 가이드는 이렇게 만들었어요</h2><span>왜 만들고, 어떻게 만들고, 돌려 보니 어떤가</span></div>
       <ol class="stepper" aria-label="만드는 과정">
         {STAGES.map((s) => (
           <li class={madeStages.has(s) ? 'done' : s === nextStage ? 'current' : ''}>
@@ -94,41 +159,6 @@ const sections = PROJECT_TYPES
     </>
   )}
 
-  {series.length > 0 && (
-    <>
-      <div class="section-head"><h2>{series[0].data.series ?? '연재'}</h2><span>순서대로 읽어요</span></div>
-      <ol class="series">
-        {series.map((post) => (
-          <li>
-            <a class="post-row" href={url(`/${post.id}`)}>
-              <span>
-                <span class="title">{post.data.title}</span>
-                <p class="summary">{post.data.summary}</p>
-                <div class="meta"><span>{fmtDate(post.data.date)}</span></div>
-              </span>
-            </a>
-          </li>
-        ))}
-      </ol>
-    </>
-  )}
-
-  {(others.length > 0 || series.length === 0) && (
-    <div class="section-head"><h2>{topic.id === 'ai-biseo' ? '직군별 사례' : '글'}</h2></div>
-  )}
-  {others.length === 0 && series.length === 0 ? (
-    <p class="empty">아직 글이 없어요. 주 1회 올라와요.</p>
-  ) : others.length === 0 ? null : (
-    <>
-      {audiences.length > 1 && (
-        <div class="chips" role="group" aria-label="직군 필터">
-          <button class="chip" aria-pressed="true" data-audience="">전체</button>
-          {audiences.map((a) => <button class="chip" aria-pressed="false" data-audience={a}>{a}</button>)}
-        </div>
-      )}
-      <PostList posts={others} filterable />
-    </>
-  )}
   <CopyScript />
 </Base>
 

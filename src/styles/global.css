@@ -175,6 +175,9 @@ ol.series .post-row::before {
 .stepper .step-count { display: block; font-size: 12px; min-height: 1.2em; }
 @media (max-width: 640px) { .stepper { grid-template-columns: repeat(3, 1fr); } }
 
+.toc .post-row.pending { color: var(--muted); background: transparent; border-style: dashed; }
+.toc .post-row.pending .title { font-weight: 600; }
+
 /* ── 글 본문 ──────────────────────────────────────────── */
 article { max-width: var(--prose); }
 .question {

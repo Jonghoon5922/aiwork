@@ -12,6 +12,11 @@ export default defineConfig({
     '/how-this-runs': '/about',
     '/how-this-runs/how-this-site-runs': '/about',
     '/claude-code': '/made',
+    // 주제 이름을 가이드로 바꾸면서 주소도 바꿨다 (2026-10-20)
+    // 정적 빌드라 동적 리다이렉트가 안 된다. 옛 주소로 나간 글은 하나씩 적는다.
+    '/ai-biseo': '/ai-at-work',
+    '/ai-biseo/hr-inquiry-reply': '/ai-at-work/hr-inquiry-reply',
+    '/ai-biseo/hr-job-posting': '/ai-at-work/hr-job-posting',
   },
   integrations: [sitemap()],
   markdown: {

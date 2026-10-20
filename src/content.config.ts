@@ -14,6 +14,8 @@ const topics = defineCollection({
     notice: z.string().optional(),
     // 홈에서 "누구를 위한 입구인지" 한 줄
     audience: z.string().optional(),
+    // 가이드 형식 주제의 차례. 연재(workbook) 글의 order 와 1:1 (첫 항목이 order 1).
+    chapters: z.array(z.string()).default([]),
   }),
 });
 
@@ -102,10 +104,10 @@ const posts = defineCollection({
 
 // 사례 큐 — 다음에 쓸 글 후보. 주간 실행이 여기서 하나를 꺼낸다 (SPEC 8절).
 const queue = defineCollection({
-  loader: file('./src/content/queue/ai-biseo.yaml'),
+  loader: file('./src/content/queue/ai-at-work.yaml'),
   schema: z.object({
     id: z.string(),
-    topic: z.string().default('ai-biseo'),
+    topic: z.string().default('ai-at-work'),
     audience: z.string(),
     task: z.string(),
     question: z.string(),

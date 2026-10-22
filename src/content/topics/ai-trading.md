@@ -1,6 +1,8 @@
 ---
 name: AI 자동 매매 만들기
 order: 2
+icon: "📈"
+color: green
 summary: AI가 혼자 판단하고 매매하는 도구를 만들고, 그 결과를 회차마다 숨김없이 기록해요. 사람은 매매에 관여하지 않아요.
 audience: AI로 투자를 시험해 보고 싶은 사람
 sources: [자동 매매 프로젝트의 git 기록과 매매 로그]

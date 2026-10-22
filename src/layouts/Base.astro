@@ -21,6 +21,10 @@ const current = (prefix: string) => (path === prefix || path.startsWith(prefix +
 const topics = (await getCollection('topics')).sort((a, b) => a.data.order - b.data.order);
 const posts = await getCollection('posts', ({ data }) => !data.draft);
 const navTopics = topics.filter((t) => posts.some((p) => p.data.topic === t.id));
+// 주제 페이지(와 그 글)는 그 주제의 색으로 물든다. 프로젝트 페이지는 made 색.
+const seg = path.split('/').filter(Boolean)[0] ?? '';
+const pageTopic = topics.find((t) => t.id === seg) ?? (seg === 'projects' ? topics.find((t) => t.id === 'made') : undefined);
+const bodyClass = pageTopic ? `theme-${pageTopic.data.color}` : 'theme-home';
 
 const website = {
   '@context': 'https://schema.org',
@@ -60,13 +64,13 @@ const website = {
     {VERIFY_GOOGLE && <meta name="google-site-verification" content={VERIFY_GOOGLE} />}
     {isHome && <script type="application/ld+json" set:html={JSON.stringify(website)} />}
   </head>
-  <body>
+  <body class={bodyClass}>
     <header class="site-header">
       <div class="wrap">
         <a class="brand" href={url('/')}><span class="brand-mark"></span>{SITE_NAME}</a>
         <nav class="nav">
           {navTopics.map((t) => (
-            <a href={url(`/${t.id}`)} aria-current={current(`/${t.id}`)}>{t.data.name}</a>
+            <a href={url(`/${t.id}`)} aria-current={current(`/${t.id}`)} class={`c-${t.data.color}`}>{t.data.icon && <span class="nav-icon">{t.data.icon}</span>}{t.data.name}</a>
           ))}
           <a href={url('/about')} aria-current={current('/about')}>소개</a>
         </nav>

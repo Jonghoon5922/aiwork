@@ -1,6 +1,8 @@
 ---
 name: 내 업무에 AI 녹이기
 order: 1
+icon: "🧑‍💼"
+color: coral
 summary: 직군이 무엇이든, 내 일 하나를 AI에게 넘겨 보는 7일 가이드. 따라 하면 내 업무용 매뉴얼 하나가 남아요.
 audience: 직군이 무엇이든, AI를 내 일에 써 보고 싶은 직장인
 sources: [워크북 원고, 사례 큐, 독자 댓글]

@@ -15,7 +15,7 @@ const { posts, showTopic = false, topicName = (id) => id, filterable = false } =
 <ul class="posts">
   {posts.map((post) => (
     <li data-audience={filterable ? (post.data.audience ?? '') : undefined}>
-      <a class="post-row" href={url(`/${post.id}`)}>
+      <a class={`post-row k-${post.data.kind}`} href={url(`/${post.id}`)}>
         <span class="title">{post.data.title}</span>
         <p class="summary">{post.data.summary}</p>
         <div class="meta">

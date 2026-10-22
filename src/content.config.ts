@@ -16,6 +16,9 @@ const topics = defineCollection({
     audience: z.string().optional(),
     // 가이드 형식 주제의 차례. 연재(workbook) 글의 order 와 1:1 (첫 항목이 order 1).
     chapters: z.array(z.string()).default([]),
+    // 입구·카드에 보이는 아이콘(이모지 하나)과 주제 색(global.css 의 --c-<color>)
+    icon: z.string().optional(),
+    color: z.enum(['coral', 'violet', 'green', 'amber', 'blue']).default('blue'),
   }),
 });
 

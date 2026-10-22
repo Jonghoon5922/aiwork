@@ -28,7 +28,7 @@ const d = project.data;
     </div>
   )}
   <div class="card-foot">
-    <span class="count">{postCount > 0 ? `연재 ${postCount}편` : '분석 글 준비 중'}</span>
+    <span class="count">{postCount > 0 ? `연재 ${postCount}편` : parentName ? `${parentName} 연재에서 함께 다뤄요` : '분석 글 준비 중'}</span>
     {d.url && <a class="link" href={d.url}>{d.url.replace(/^https?:\/\//, '')} ↗</a>}
   </div>
 </li>

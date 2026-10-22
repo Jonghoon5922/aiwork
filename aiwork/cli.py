@@ -33,7 +33,7 @@ def _s(value: str) -> str:
 
 
 def render(site: Path, sources: list[cfg.Source], projects: list[cfg.Project],
-           forbidden: cfg.Forbidden, comments: cfg.Comments) -> str:
+           forbidden: cfg.Forbidden, comments: cfg.Comments, feeds: list[cfg.Feed] | None = None) -> str:
     lines = [
         "# aiwork 설정. 이 파일은 공개 저장소에 두지 않는다 — 금지어와 댓글 API 키가 들어 있다.",
         "",
@@ -49,6 +49,8 @@ def render(site: Path, sources: list[cfg.Source], projects: list[cfg.Project],
         if p.repo:
             lines.append(f"repo = {_s(p.repo)}")
         lines.append("")
+    for f in feeds or []:
+        lines += ["[[feeds]]", f"name = {_s(f.name)}", f"url = {_s(f.url)}", f"lang = {_s(f.lang)}", ""]
     lines += [
         "[forbidden]",
         "# 고객사명·내부 시스템명 등. 한 번 공개되면 되돌릴 수 없다.",
@@ -68,7 +70,7 @@ def render(site: Path, sources: list[cfg.Source], projects: list[cfg.Project],
 
 def _save(config: cfg.Config) -> None:
     cfg.config_path().write_text(
-        render(config.site.path, config.sources, config.projects, config.forbidden, config.comments),
+        render(config.site.path, config.sources, config.projects, config.forbidden, config.comments, config.feeds),
         encoding="utf-8",
     )
 
@@ -137,6 +139,20 @@ def add_project(path: Path = typer.Argument(..., help="프로젝트 폴더 (git 
     err.print(f"[green]등록했다:[/green] {label}{' (비공개)' if private else ''} → {target}")
 
 
+@app.command("add-feed")
+def add_feed(url: str = typer.Argument(..., help="RSS/Atom 주소"),
+             name: str = typer.Option(..., "--name", help="이름"),
+             lang: str = typer.Option("en", "--lang", help="언어 (en/ko)")) -> None:
+    """Weekly AI 피드를 등록한다."""
+    config = cfg.load()
+    if any(f.name == name for f in config.feeds):
+        err.print(f"[red]이미 등록된 이름이다:[/red] {name}")
+        raise typer.Exit(1)
+    config.feeds.append(cfg.Feed(name=name, url=url, lang=lang))
+    _save(config)
+    err.print(f"[green]등록했다:[/green] {name} → {url}")
+
+
 @app.command()
 def status() -> None:
     """주제별 글 수·큐, 프로젝트별 밀린 커밋."""
@@ -163,6 +179,7 @@ def status() -> None:
                   str(n), collect.head(project) or "-")
     err.print(p)
     err.print("원고 폴더: " + (", ".join(f"{s.name}→{s.topic}" for s in config.sources) or "(없음)"))
+    err.print("피드: " + (", ".join(f.name for f in config.feeds) or "(없음)"))
 
 
 @app.command()

@@ -110,8 +110,11 @@ def gather(config: Config, min_commits: int = MIN_COMMITS, sample: int = 15) -> 
     else:
         comments_note = "[comments] 설정이 비어 있다."
 
+    digests = content.list_posts(config, kind="digest", status="published")
+
     return {
         "generated_at": now,
+        "weekly_ai": {"feeds": [f.name for f in config.feeds], "published": len(digests), "next_order": len(digests) + 1},
         "last_run": state.get("last_run"),
         "projects": {"ready": ready, "skipped": skipped},
         "next_case": next_case,
@@ -147,6 +150,9 @@ def render(result: dict) -> str:
     for w in wb["sources"]:
         flag = "경험담 자리가 남아 있어 못 낸다" if w["placeholders"] else "플레이스홀더 없음 — 다음 편을 낼 수 있다"
         out.append(f"- {w['source']}/{w['doc']}: 플레이스홀더 {w['placeholders']}개 → {flag}")
+    out.append("")
+    wa = result.get("weekly_ai", {})
+    out.append(f"## 5. Weekly AI (게시 {wa.get('published', 0)}편, 다음 {wa.get('next_order', 1)}주차) — 피드 {', '.join(wa.get('feeds', [])) or '없음'}")
     out.append("")
     cm = result["comments"]
     if cm["new"] is None:

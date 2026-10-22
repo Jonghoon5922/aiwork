@@ -37,6 +37,7 @@ export const KIND_LABEL: Record<string, string> = {
   operate: '운영',
   decision: '결정 기록',
   journal: '회차',
+  digest: '소식',
 };
 
 // 글 하단 고정 문구 (SPEC 3절). 숨길 일이 아니라 이 사이트의 차별점이다.

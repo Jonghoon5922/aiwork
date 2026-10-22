@@ -24,14 +24,14 @@ const topic = topics.find((t) => t.id === post.data.topic);
 // 같은 주제의 글들 — 이전·다음(연재는 order, 나머지는 날짜)과 관련 글
 const siblings = (await getCollection('posts', ({ data }) => !data.draft && data.topic === post.data.topic));
 const ordered =
-  post.data.kind === 'workbook' || post.data.kind === 'journal'
+  post.data.kind === 'workbook' || post.data.kind === 'journal' || post.data.kind === 'digest'
     ? siblings.filter((p) => p.data.kind === post.data.kind && p.data.series === post.data.series).sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
     : post.data.project
       ? siblings.filter((p) => p.data.project === post.data.project).sort((a, b) => {
           const si = (k: string) => { const i = (STAGES as readonly string[]).indexOf(k); return i < 0 ? STAGES.length : i; };
           return si(a.data.kind) - si(b.data.kind) || a.data.date.valueOf() - b.data.date.valueOf();
         })
-      : siblings.filter((p) => p.data.kind !== 'workbook' && p.data.kind !== 'journal').sort((a, b) => a.data.date.valueOf() - b.data.date.valueOf());
+      : siblings.filter((p) => !['workbook', 'journal', 'digest'].includes(p.data.kind)).sort((a, b) => a.data.date.valueOf() - b.data.date.valueOf());
 const idx = ordered.findIndex((p) => p.id === post.id);
 const prev = idx > 0 ? ordered[idx - 1] : null;
 const next = idx >= 0 && idx < ordered.length - 1 ? ordered[idx + 1] : null;

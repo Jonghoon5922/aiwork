@@ -86,6 +86,15 @@ class Project:
 
 
 @dataclass
+class Feed:
+    """Weekly AI 재료 피드. 이 목록 밖은 읽지 않는다."""
+
+    name: str
+    url: str
+    lang: str = "en"
+
+
+@dataclass
 class Forbidden:
     """마스킹 검사 규칙. 실물 목록은 설정 파일에만 있다."""
 
@@ -114,6 +123,14 @@ class Config:
     forbidden: Forbidden
     comments: Comments
     source_file: Path
+    feeds: list[Feed] = field(default_factory=list)
+
+    def feed(self, name: str) -> Feed:
+        for f in self.feeds:
+            if f.name == name:
+                return f
+        known = ", ".join(f.name for f in self.feeds) or "(없음)"
+        raise AccessDenied(f"'{name}' 은 등록되지 않은 피드다. 등록된 것: {known}")
 
     def project(self, name: str) -> Project:
         for p in self.projects:
@@ -199,9 +216,15 @@ def load(path: Path | None = None) -> Config:
     c_raw = raw.get("comments") or {}
     comments = Comments(api_url=c_raw.get("api_url"), api_key=c_raw.get("api_key"))
 
+    feeds: list[Feed] = []
+    for item in raw.get("feeds", []):
+        if not item.get("name") or not item.get("url"):
+            raise ConfigError(f"[[feeds]] 에 name·url 이 필요하다: {item!r}")
+        feeds.append(Feed(name=item["name"], url=item["url"], lang=item.get("lang", "en")))
+
     return Config(
         site=site, sources=sources, projects=projects,
-        forbidden=forbidden, comments=comments, source_file=path,
+        forbidden=forbidden, comments=comments, source_file=path, feeds=feeds,
     )
 
 

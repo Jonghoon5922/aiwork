@@ -76,7 +76,7 @@ export const STAGE_QUESTION: Record<(typeof STAGES)[number], string> = {
   deploy: '어떻게 내보냈나',
   operate: '돌려 보니 어떤가',
 };
-export const KINDS = ['workbook', 'case', ...STAGES, 'decision', 'journal'] as const;
+export const KINDS = ['workbook', 'case', ...STAGES, 'decision', 'journal', 'digest'] as const;
 
 const posts = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/posts' }),

@@ -18,8 +18,9 @@ const { Content } = await render(topic);
 const posts = (await getCollection('posts', ({ data }) => !data.draft && data.topic === topic.id))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 
+const SERIAL = ['workbook', 'journal', 'digest'];
 const series = posts
-  .filter((p) => p.data.kind === 'workbook' || p.data.kind === 'journal')
+  .filter((p) => SERIAL.includes(p.data.kind))
   .sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0));
 // 만드는 과정 — 이 주제에 속한 프로젝트의 개발 주기 글(분석→…→운영). "만든 것들" 은 카드로 보여 주므로 제외.
 const stageIndex = (k: string) => { const i = (STAGES as readonly string[]).indexOf(k); return i < 0 ? STAGES.length : i; };
@@ -27,7 +28,7 @@ const making = topic.id === 'made' ? [] : posts
   .filter((p) => (STAGES as readonly string[]).includes(p.data.kind))
   .sort((a, b) => stageIndex(a.data.kind) - stageIndex(b.data.kind) || a.data.date.valueOf() - b.data.date.valueOf());
 const makingIds = new Set(making.map((p) => p.id));
-const others = posts.filter((p) => p.data.kind !== 'workbook' && p.data.kind !== 'journal' && !makingIds.has(p.id));
+const others = posts.filter((p) => !SERIAL.includes(p.data.kind) && !makingIds.has(p.id));
 const audiences = [...new Set(others.map((p) => p.data.audience).filter(Boolean))] as string[];
 const madeStages = new Set(making.map((p) => p.data.kind));
 const nextStage = STAGES.find((s) => !madeStages.has(s));

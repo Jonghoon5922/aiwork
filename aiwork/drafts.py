@@ -18,7 +18,7 @@ from . import check, collect, content
 from .config import AccessDenied, Config
 
 STAGES = ("analysis", "design", "build", "test", "deploy", "operate")
-KINDS = ("workbook", "case", *STAGES, "decision", "journal")
+KINDS = ("workbook", "case", *STAGES, "decision", "journal", "digest")
 
 _SLUG_STRIP = re.compile(r"[^0-9A-Za-z가-힣\s-]")
 _SLUG_SPACE = re.compile(r"\s+")
@@ -69,7 +69,7 @@ def save_draft(config: Config, topic: str, kind: str, title: str, body: str, sum
             until_commit = collect.head(proj)
     if kind == "case" and not audience:
         raise AccessDenied("kind=case 는 audience(직군) 가 필요하다.")
-    if kind in ("workbook", "journal") and (series is None or order is None):
+    if kind in ("workbook", "journal", "digest") and (series is None or order is None):
         raise AccessDenied(f"kind={kind} 은 series 와 order 가 필요하다.")
 
     slug = slug or make_slug(title)

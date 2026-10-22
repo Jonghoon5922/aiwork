@@ -173,6 +173,7 @@ h3 { font-size: 17.5px; margin: 28px 0 8px; font-weight: 700; }
 .post-row.k-workbook { --accent: var(--c-amber); }
 .post-row.k-analysis, .post-row.k-design, .post-row.k-build, .post-row.k-test, .post-row.k-deploy, .post-row.k-operate, .post-row.k-decision { --accent: var(--c-violet); }
 .post-row.k-journal { --accent: var(--c-green); }
+.post-row.k-digest { --accent: var(--c-blue); }
 .post-row .title { font-weight: 700; font-size: 17px; line-height: 1.45; display: block; }
 .post-row .summary { color: var(--muted); font-size: 14.5px; margin: 6px 0 0; line-height: 1.6; }
 .meta { color: var(--muted); font-size: 13px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 8px; }

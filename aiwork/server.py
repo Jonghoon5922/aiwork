@@ -13,7 +13,7 @@ from typing import Any
 
 from mcp.server.mcpserver import MCPServer
 
-from . import __version__, check as masking, collect, comments, content, drafts, publish as publishing, weekly as weekly_mod
+from . import __version__, check as masking, collect, comments, content, drafts, feeds, publish as publishing, weekly as weekly_mod
 from .config import Config
 
 
@@ -36,6 +36,7 @@ def build_instructions(config: Config) -> str:
         rows.append(f"{project.name} (마지막 글 {when}, 이후 커밋 {n}건)")
     lines.append("연재 프로젝트: " + (", ".join(rows) if rows else "(없음)"))
     lines.append("원고 폴더: " + (", ".join(f"{s.name}→{s.topic}" for s in config.sources) or "(없음)"))
+    lines.append("Weekly AI 피드: " + (", ".join(f.name for f in config.feeds) or "(없음)"))
     lines.append("")
     lines.append(
         "글을 쓰기 전 재료를 모은다. 프로젝트 글은 get_changes·get_diff·read_doc, "
@@ -210,6 +211,25 @@ def create_server(config: Config) -> MCPServer:
     @server.tool(name="site_state", description="사이트 저장소 상태 — 브랜치, 커밋 안 된 콘텐츠 변경, push 안 된 커밋 수.")
     def site_state_tool() -> dict:
         return publishing.state(config)
+
+    # ── Weekly AI 재료 (피드) ────────────────────────────────────────
+
+    @server.tool(name="list_feeds", description="Weekly AI 에 쓰는 등록 피드 목록. 이 밖의 주소는 읽지 않는다.")
+    def list_feeds_tool() -> list[dict]:
+        return feeds.list_feeds(config)
+
+    @server.tool(name="fetch_feed", description=(
+        "등록된 피드에서 최근 days 일 안의 항목을 받는다(제목·링크·날짜·짧은 요약). 본문이 필요하면 fetch_article."
+    ))
+    def fetch_feed_tool(name: str, days: int = 7, limit: int = 20) -> dict:
+        return feeds.fetch_feed(config, name, days=days, limit=limit)
+
+    @server.tool(name="fetch_article", description=(
+        "fetch_feed 로 받은 항목의 링크 본문을 텍스트로 읽는다. 피드에서 받지 않은 URL 은 거부한다. "
+        "요약은 반드시 이 본문을 읽은 뒤에 쓴다. 원문을 옮기지 않는다."
+    ))
+    def fetch_article_tool(url: str) -> dict:
+        return feeds.fetch_article(url)
 
     # ── 주간 (5단계) ─────────────────────────────────────────────────
 

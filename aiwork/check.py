@@ -17,7 +17,8 @@ from .config import Config
 
 _BS = chr(92) * 2
 _TAIL = r"[^\s" + chr(34) + chr(39) + chr(96) + r")\]]+"
-_ABS_PATH = re.compile(r"(?:[A-Za-z]:[" + _BS + r"/]" + _TAIL + r"|/(?:home|Users)/" + _TAIL + r")")
+# 드라이브 문자 앞에 글자가 붙어 있으면(https://, file:// 의 "s:") 경로가 아니다. 출처 링크를 막지 않기 위해.
+_ABS_PATH = re.compile(r"(?:(?<![A-Za-z0-9])[A-Za-z]:[" + _BS + r"/]" + _TAIL + r"|/(?:home|Users)/" + _TAIL + r")")
 
 # 저자 경험담 자리. 이게 남아 있으면 그 글은 못 나간다 — 지어내지 않기 위한 장치다.
 PLACEHOLDER = "[저자 경험 넣을 자리"

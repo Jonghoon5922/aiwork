@@ -38,3 +38,10 @@ def test_hedges_warn_only(tmp_path: Path):
     text = "\n".join(["이렇게 할 수 있습니다."] * 8)
     r = check.check_text(text, _config(tmp_path))
     assert r["ok"] and r["warnings"] == 1
+
+
+def test_https_link_is_not_a_path(tmp_path: Path):
+    # Weekly AI 출처 링크의 "https://" 를 드라이브 경로("s://")로 오인하지 않는다
+    r = check.check_text("출처: [OpenAI](https://openai.com/index/x) 를 보세요", _config(tmp_path))
+    rules = [f["rule"] for f in r["findings"]]
+    assert "등록되지 않은 절대 경로" not in rules

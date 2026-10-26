@@ -15,7 +15,7 @@
   audience: 인사 담당자
   task: 면접 질문지 직무별 수정
   question: 면접 질문을 직무별로 AI에게 만들게 해도 되나요
-  status: 대기
+  status: 게시
 - id: teacher-essay-items
   audience: 교사
   task: 서술형 문항 출제

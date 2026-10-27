@@ -1,0 +1,49 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import PostList from '../../components/PostList.astro';
+import { url } from '../../lib/site';
+import { termsInText } from '../../lib/terms';
+
+export async function getStaticPaths() {
+  const terms = await getCollection('terms');
+  return terms.map((term) => ({ params: { slug: term.id }, props: { term } }));
+}
+
+const { term } = Astro.props;
+const { Content } = await render(term);
+const posts = (await getCollection('posts', ({ data }) => !data.draft))
+  .filter((p) => termsInText(`${p.data.title}\n${p.body ?? ''}`, [term]).length > 0)
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+// 받침이 있으면 '이란', 없거나 한글이 아니면 '란'
+const last = term.data.term.charCodeAt(term.data.term.length - 1);
+const hangul = last >= 0xac00 && last <= 0xd7a3;
+const particle = hangul && (last - 0xac00) % 28 !== 0 ? '이란' : '란';
+const title = `${term.data.term}${particle} 뭐예요`;
+const defined = {
+  '@context': 'https://schema.org',
+  '@type': 'DefinedTerm',
+  name: term.data.term,
+  alternateName: term.data.aliases,
+  description: term.data.short,
+  inDefinedTermSet: new URL('/glossary/', Astro.site).toString(),
+};
+---
+
+<Base title={title} description={term.data.short}>
+  <script type="application/ld+json" set:html={JSON.stringify(defined)} />
+  <article>
+    <div class="meta" style="margin:0 0 10px"><a href={url('/glossary')}>용어집</a></div>
+    <h1>{term.data.term}</h1>
+    {term.data.aliases.length > 0 && <p class="meta" style="margin:0 0 14px">같이 쓰는 말: {term.data.aliases.join(', ')}</p>}
+    <p class="term-def">{term.data.short}</p>
+    <div class="prose"><Content /></div>
+  </article>
+
+  {posts.length > 0 && (
+    <section class="related">
+      <div class="section-head"><h2>이 용어가 나온 글</h2><span>{posts.length}편</span></div>
+      <PostList posts={posts} showTopic />
+    </section>
+  )}
+</Base>

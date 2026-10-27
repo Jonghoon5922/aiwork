@@ -119,4 +119,15 @@ const queue = defineCollection({
   }),
 });
 
-export const collections = { topics, pages, projects, posts, queue };
+// 용어집 — 용어 하나가 파일 하나. 글 본문에서 term·aliases 가 나오면 자동으로 엮인다.
+const terms = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/terms' }),
+  schema: z.object({
+    term: z.string(),
+    aliases: z.array(z.string()).default([]),
+    // 한 줄 정의. 목록과 글 하단 "이 글의 용어" 에 보인다.
+    short: z.string(),
+  }),
+});
+
+export const collections = { topics, pages, projects, posts, queue, terms };

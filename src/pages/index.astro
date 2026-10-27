@@ -37,6 +37,14 @@ const topicName = (id: string) => topics.find((t) => t.id === id)?.data.name ?? 
       </li>
     ))}
     <li>
+      <a class="entrance muted c-blue" href={url('/glossary')}>
+        <span class="icon" aria-hidden="true">📖</span>
+        <span class="who">글에 나온 말이 낯설면</span>
+        <span class="name">용어집 →</span>
+        <span class="what">정의 한 줄, 비유 하나, 내 업무에서 어디서 만나는지. 글마다 아래에 "이 글의 용어"가 붙어요.</span>
+      </a>
+    </li>
+    <li>
       <a class="entrance muted c-amber" href={url('/about')}>
         <span class="icon" aria-hidden="true">🤖</span>
         <span class="who">이 사이트가 궁금하면</span>

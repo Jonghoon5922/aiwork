@@ -13,7 +13,7 @@ from typing import Any
 
 from mcp.server.mcpserver import MCPServer
 
-from . import __version__, check as masking, collect, comments, content, drafts, feeds, publish as publishing, weekly as weekly_mod
+from . import __version__, check as masking, collect, comments, content, drafts, feeds, publish as publishing, weekly as weekly_mod, terms as terms_mod
 from .config import Config
 
 
@@ -267,6 +267,21 @@ def create_server(config: Config) -> MCPServer:
     @server.tool(name="unhide_comment", description="자동 숨김된 댓글을 다시 보이게 한다.")
     def unhide_comment_tool(comment_id: int) -> dict:
         return comments.unhide(config, comment_id)
+
+    # ── 용어집 ───────────────────────────────────────────────────────
+
+    @server.tool(name="list_terms", description="용어집에 있는 용어 전부(slug, term, aliases, short). 새 용어를 쓰기 전에 겹치는지 본다.")
+    def list_terms_tool() -> list[dict]:
+        return terms_mod.list_terms(config)
+
+    @server.tool(name="save_term", description=(
+        "용어집에 용어 한 개를 만든다. 초안 없이 바로 src/content/terms/<slug>.md 에 쓰고 검사해, block 이 있으면 저장하지 않고 결과만 돌려준다. "
+        "publish 가 함께 올린다. short 는 한 줄 정의(해요체). body 는 **비유.** / **내 업무에서 어디서 만나나.** / **흔한 오해.**(또는 주의·한계·이 사이트의 선택) 세 단락, 각 두세 문장. "
+        "글 본문에 term 이나 aliases 가 나오면 그 글 하단에 자동으로 엮이므로, 별칭은 글에서 실제로 쓰는 표기로 넣는다. 두 글자 이하 별칭은 엮이지 않는다. "
+        "이미 있는 용어(별칭 포함)는 거부된다."
+    ))
+    def save_term_tool(slug: str, term: str, short: str, body: str, aliases: list[str] | None = None) -> dict:
+        return terms_mod.save_term(config, slug=slug, term=term, short=short, body=body, aliases=aliases)
 
     return server
 

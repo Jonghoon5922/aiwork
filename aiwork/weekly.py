@@ -14,7 +14,7 @@ import json
 from datetime import datetime, timezone
 from pathlib import Path
 
-from . import check, collect, comments, content
+from . import check, collect, comments, content, terms as terms_mod
 from .config import Config, config_dir
 
 MIN_COMMITS = 3
@@ -121,6 +121,8 @@ def gather(config: Config, min_commits: int = MIN_COMMITS, sample: int = 15) -> 
         "queue_waiting": len(waiting),
         "workbook": {"sources": workbook, "published_parts": len(published_parts)},
         "comments": {"new": new_comments, "note": comments_note},
+        "terms": {"count": len(terms_mod.list_terms(config)),
+                  "names": [t["term"] for t in terms_mod.list_terms(config)]},
     }
 
 

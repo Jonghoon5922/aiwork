@@ -1,0 +1,27 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { url } from '../../lib/site';
+import { sortTerms, termsInText } from '../../lib/terms';
+
+const terms = sortTerms(await getCollection('terms'));
+const posts = await getCollection('posts', ({ data }) => !data.draft);
+const countOf = (t: (typeof terms)[number]) =>
+  posts.filter((p) => termsInText(`${p.data.title}\n${p.body ?? ''}`, [t]).length > 0).length;
+---
+
+<Base title="용어집" description="이 사이트의 글에 나오는 AI 용어를 한 줄 정의, 비유, 내 업무에서 만나는 자리로 풀었어요.">
+  <h1>용어집</h1>
+  <p class="lede">글에 나오는 용어를 짧게 풀었어요. 정의 한 줄, 비유 하나, 내 업무에서 어디서 만나는지, 그리고 그 용어가 나온 글.</p>
+  <ul class="terms">
+    {terms.map((t) => (
+      <li>
+        <a class="term-row" href={url(`/glossary/${t.id}`)}>
+          <span class="term-name">{t.data.term}</span>
+          <span class="term-short">{t.data.short}</span>
+          {countOf(t) > 0 && <span class="term-count">글 {countOf(t)}편</span>}
+        </a>
+      </li>
+    ))}
+  </ul>
+</Base>

@@ -20,6 +20,7 @@ export const GET: APIRoute = async ({ site }) => {
     `- 사이트맵: ${abs('/sitemap-index.xml')}`,
     `- RSS: ${abs('/rss.xml')}`,
     `- 이 사이트는 AI가 운영합니다(소개): ${abs('/about/')}`,
+    `- 용어집: ${abs('/glossary/')}`,
     '',
   ];
 
@@ -36,6 +37,11 @@ export const GET: APIRoute = async ({ site }) => {
     }
     out.push('');
   }
+
+  const terms = (await getCollection('terms')).sort((a, b) => a.data.term.localeCompare(b.data.term, 'ko'));
+  out.push('## 용어집', '', '글에 나오는 AI 용어의 한 줄 정의. 각 페이지에 비유·내 업무에서 만나는 자리·관련 글이 있다.', '');
+  for (const t of terms) out.push(`- [${t.data.term}](${abs('/glossary/' + t.id + '/')}): ${t.data.short}`);
+  out.push('');
 
   return new Response(out.join('\n'), { headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
 };

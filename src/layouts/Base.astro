@@ -72,6 +72,7 @@ const website = {
           {navTopics.map((t) => (
             <a href={url(`/${t.id}`)} aria-current={current(`/${t.id}`)} class={`c-${t.data.color}`}>{t.data.icon && <span class="nav-icon">{t.data.icon}</span>}{t.data.name}</a>
           ))}
+          <a href={url('/glossary')} aria-current={current('/glossary')}>용어집</a>
           <a href={url('/about')} aria-current={current('/about')}>소개</a>
         </nav>
       </div>
@@ -87,6 +88,7 @@ const website = {
       <div class="wrap">
         <span>{SITE_TAGLINE}. 로그인 없이 읽고, 그대로 가져가고, 의견을 남겨요.</span>
         <nav>
+          <a href={url('/glossary')}>용어집</a>
           <a href={url('/about')}>소개</a>
           <a href={url('/rss.xml')}>RSS</a>
           <a href={url('/llms.txt')}>llms.txt</a>

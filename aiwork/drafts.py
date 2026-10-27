@@ -14,7 +14,7 @@ from pathlib import Path
 
 import yaml
 
-from . import check, collect, content
+from . import check, collect, content, og
 from .config import AccessDenied, Config
 
 STAGES = ("analysis", "design", "build", "test", "deploy", "operate")
@@ -118,8 +118,9 @@ def approve(config: Config, draft_id: str) -> dict:
     queue_note = None
     if meta.get("queue_id"):
         queue_note = _set_queue_status(config, meta["queue_id"], "게시")
+    image = og.render(config, meta["topic"], target.stem, meta["title"], meta.get("kind"))
     return {"id": draft_id, "path": str(target.relative_to(config.site.path)), "moved": True,
-            "warnings": result["warnings"], "queue": queue_note,
+            "warnings": result["warnings"], "queue": queue_note, "og_image": image,
             "note": "posts/ 로 옮겼다. publish 로 push 하면 사이트에 올라간다."}
 
 

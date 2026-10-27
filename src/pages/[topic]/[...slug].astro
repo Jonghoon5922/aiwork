@@ -1,5 +1,6 @@
 ---
 import { getCollection, render } from 'astro:content';
+import { existsSync } from 'node:fs';
 import Base from '../../layouts/Base.astro';
 import PostList from '../../components/PostList.astro';
 import Comments from '../../components/Comments.astro';
@@ -21,6 +22,9 @@ const { post } = Astro.props;
 const { Content } = await render(post);
 const allTerms = await getCollection('terms');
 const postTerms = sortTerms(termsInText(postText(post), allTerms));
+// approve 때 만든 글별 OG 이미지. 없으면 Base 가 기본 이미지를 쓴다.
+const ogFile = `/og/${post.id.replace('/', '-')}.png`;
+const ogImage = existsSync(new URL(`../../../public${ogFile}`, import.meta.url)) ? ogFile : undefined;
 const topics = await getCollection('topics');
 const topic = topics.find((t) => t.id === post.data.topic);
 
@@ -68,7 +72,7 @@ const faq =
     : null;
 ---
 
-<Base title={post.data.title} description={post.data.summary} type="article">
+<Base title={post.data.title} description={post.data.summary} type="article" image={ogImage}>
   <script type="application/ld+json" set:html={JSON.stringify(article)} />
   {faq && <script type="application/ld+json" set:html={JSON.stringify(faq)} />}
 

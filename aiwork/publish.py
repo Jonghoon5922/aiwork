@@ -12,6 +12,7 @@ from datetime import datetime
 from .config import Config
 
 CONTENT_DIR = "src/content"
+OG_DIR = "public/og"  # approve 가 만드는 글별 OG 이미지. 콘텐츠와 함께 올린다.
 
 
 def _git(config: Config, *args: str) -> tuple[int, str]:
@@ -26,7 +27,7 @@ def _git(config: Config, *args: str) -> tuple[int, str]:
 def state(config: Config) -> dict:
     rc, branch = _git(config, "rev-parse", "--abbrev-ref", "HEAD")
     branch = branch.strip()
-    _, dirty = _git(config, "status", "--porcelain", "--", CONTENT_DIR)
+    _, dirty = _git(config, "status", "--porcelain", "--", CONTENT_DIR, OG_DIR)
     _, ahead = _git(config, "rev-list", "--count", "@{u}..HEAD")
     ahead = ahead.strip()
     return {
@@ -42,7 +43,7 @@ def publish(config: Config, message: str | None = None, push: bool = True) -> di
     if not before["content_dirty"]:
         return {"published": False, "note": "콘텐츠 변경이 없다.", **before}
 
-    rc, out = _git(config, "add", "--", CONTENT_DIR)
+    rc, out = _git(config, "add", "--", CONTENT_DIR, OG_DIR)
     if rc != 0:
         return {"published": False, "note": f"git add 실패: {out}"}
 

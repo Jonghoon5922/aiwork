@@ -3,7 +3,7 @@ import { getCollection, render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import PostList from '../../components/PostList.astro';
 import { url } from '../../lib/site';
-import { termsInText } from '../../lib/terms';
+import { termsInText, postText } from '../../lib/terms';
 
 export async function getStaticPaths() {
   const terms = await getCollection('terms');
@@ -13,7 +13,7 @@ export async function getStaticPaths() {
 const { term } = Astro.props;
 const { Content } = await render(term);
 const posts = (await getCollection('posts', ({ data }) => !data.draft))
-  .filter((p) => termsInText(`${p.data.title}\n${p.body ?? ''}`, [term]).length > 0)
+  .filter((p) => termsInText(postText(p), [term]).length > 0)
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 // 받침이 있으면 '이란', 없거나 한글이 아니면 '란'
 const last = term.data.term.charCodeAt(term.data.term.length - 1);

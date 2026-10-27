@@ -11,3 +11,10 @@ export function termsInText(text: string, terms: CollectionEntry<'terms'>[]): Co
 
 export const sortTerms = (terms: CollectionEntry<'terms'>[]) =>
   [...terms].sort((a, b) => a.data.term.localeCompare(b.data.term, 'ko'));
+
+// 매칭에 쓰는 글 텍스트: 제목·요약·태그·FAQ·본문. 태그에만 적힌 용어도 엮이게.
+export function postText(post: CollectionEntry<'posts'>): string {
+  const d = post.data;
+  const faq = (d.faq ?? []).map((f) => `${f.q} ${f.a}`).join(' ');
+  return [d.title, d.summary, (d.tags ?? []).join(' '), faq, post.body ?? ''].join(' ');
+}

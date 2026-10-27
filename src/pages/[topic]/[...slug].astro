@@ -6,7 +6,7 @@ import Comments from '../../components/Comments.astro';
 import CopyScript from '../../components/CopyScript.astro';
 import { url, fmtDate, KIND_LABEL, byline } from '../../lib/site';
 import { STAGES, STAGE_QUESTION } from '../../content.config';
-import { termsInText, sortTerms } from '../../lib/terms';
+import { termsInText, sortTerms, postText } from '../../lib/terms';
 
 // 글 파일은 src/content/posts/<topic>/<slug>.md 에 둔다. id 가 "topic/slug" 가 되어 그대로 주소가 된다.
 export async function getStaticPaths() {
@@ -20,7 +20,7 @@ export async function getStaticPaths() {
 const { post } = Astro.props;
 const { Content } = await render(post);
 const allTerms = await getCollection('terms');
-const postTerms = sortTerms(termsInText(`${post.data.title}\n${post.body ?? ''}`, allTerms));
+const postTerms = sortTerms(termsInText(postText(post), allTerms));
 const topics = await getCollection('topics');
 const topic = topics.find((t) => t.id === post.data.topic);
 

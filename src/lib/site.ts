@@ -7,7 +7,7 @@ export const SITE_TAGLINE = 'AI하고 일하고, AI하고 만들어요';
 // 검색 엔진 소유 확인 토큰. 서치어드바이저·서치콘솔에서 "HTML 태그" 방식을 고르면 주는 content 값.
 // 비어 있으면 태그를 내지 않는다.
 export const VERIFY_NAVER = '';
-export const VERIFY_GOOGLE = '';
+export const VERIFY_GOOGLE = 'NYsvmQ30x49kuT';
 
 // 익명 댓글 (4단계). Worker 주소와 Turnstile site key. 비어 있으면 댓글 영역을 그리지 않는다.
 export const COMMENTS_API = 'https://comments.aihago.com';

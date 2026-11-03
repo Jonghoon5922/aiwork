@@ -72,6 +72,9 @@ def save_draft(config: Config, topic: str, kind: str, title: str, body: str, sum
     if kind in ("workbook", "journal", "digest") and (series is None or order is None):
         raise AccessDenied(f"kind={kind} 은 series 와 order 가 필요하다.")
 
+    # 연재 회차(digest/journal/workbook)는 제목 대신 번호로. 제목 slug 는 한글 주소가 된다.
+    if not slug and order and kind in ("digest", "journal", "workbook"):
+        slug = {"digest": "week", "journal": "round", "workbook": "day"}[kind] + f"-{order}"
     slug = slug or make_slug(title)
     path = config.site.drafts / topic / f"{slug}.md"
     if path.exists() or (config.site.posts / topic / f"{slug}.md").exists():

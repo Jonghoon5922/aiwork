@@ -20,7 +20,7 @@
   audience: 교사
   task: 서술형 문항 출제
   question: 서술형 평가 문항을 AI로 만들 때 진도와 채점 기준은 어떻게 맞추나요
-  status: 대기
+  status: 게시
 - id: teacher-feedback
   audience: 교사
   task: 학생 소감문 피드백 한 줄

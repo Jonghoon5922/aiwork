@@ -25,7 +25,7 @@
   audience: 교사
   task: 학생 소감문 피드백 한 줄
   question: 학생 글에 피드백을 AI로 달아도 되나요, 이름은 어떻게 하나요
-  status: 대기
+  status: 게시
 - id: teacher-worksheet
   audience: 교사
   task: 학습지 만들기

@@ -30,7 +30,7 @@
   audience: 교사
   task: 학습지 만들기
   question: 수업 학습지를 AI로 만드는 순서가 있나요
-  status: 대기
+  status: 게시
 - id: marketer-sns
   audience: 마케터
   task: SNS 게시글 초안

@@ -43,7 +43,8 @@ def publish(config: Config, message: str | None = None, push: bool = True) -> di
     if not before["content_dirty"]:
         return {"published": False, "note": "콘텐츠 변경이 없다.", **before}
 
-    rc, out = _git(config, "add", "--", CONTENT_DIR, OG_DIR)
+    paths = [d for d in (CONTENT_DIR, OG_DIR) if (config.site.path / d).exists()]
+    rc, out = _git(config, "add", "--", *paths)
     if rc != 0:
         return {"published": False, "note": f"git add 실패: {out}"}
 
@@ -58,6 +59,17 @@ def publish(config: Config, message: str | None = None, push: bool = True) -> di
     note = "커밋했다. push 는 하지 않았다."
     if push:
         rc, out = _git(config, "push", "-q", "origin", "HEAD")
+        if rc != 0:
+            # 다른 예약 실행이 먼저 올렸을 수 있다. 받아서 그 위에 얹고 한 번만 다시 올린다.
+            # 글은 파일이 서로 달라 충돌이 드물다. 충돌하면 rebase 를 되돌리고 실패로 알린다.
+            rc2, out2 = _git(config, "pull", "--rebase", "--autostash", "-q", "origin", before["branch"] or "main")
+            if rc2 != 0:
+                _git(config, "rebase", "--abort")
+                return {"published": False, "commit": sha, "files": before["content_dirty"],
+                        "note": f"push 실패 후 pull --rebase 도 실패(충돌 가능). 커밋은 로컬에 있다: {out2}"}
+            _, sha = _git(config, "rev-parse", "--short", "HEAD")
+            sha = sha.strip()
+            rc, out = _git(config, "push", "-q", "origin", "HEAD")
         pushed = rc == 0
         note = "push 했다. Actions 가 빌드하면 사이트에 올라간다. deploy_status 로 확인한다." if pushed else f"push 실패: {out}"
 

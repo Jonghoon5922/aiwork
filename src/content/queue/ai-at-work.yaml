@@ -46,3 +46,76 @@
   task: 설문 응답 공통 의견 뽑기
   question: 설문 응답 수백 건에서 공통 의견을 AI로 뽑는 법
   status: 대기
+# 2026-11-18 추가 12건. source 는 그 글이 중심에 둘 지점(앞선 글과 교훈이 겹치지 않게).
+- id: owner-review-reply
+  audience: 자영업자
+  task: 고객 리뷰 답글
+  question: 가게 리뷰 답글을 AI로 써도 티가 안 나나요
+  status: 대기
+  source: "중심 - 가게 말투 견본을 먼저 건네기"
+- id: owner-product-page
+  audience: 자영업자
+  task: 상품 상세페이지 문구
+  question: 스마트스토어 상세페이지 문구를 AI로 쓰는 법
+  status: 대기
+  source: "중심 - 효능·원산지처럼 지어내면 안 되는 항목"
+- id: owner-notice
+  audience: 자영업자
+  task: 휴무·가격 변경 공지문
+  question: 가게 공지문을 AI에게 맡기면 뭘 확인해야 하나요
+  status: 대기
+  source: "중심 - 날짜와 금액은 사람이 대조"
+- id: planner-action-items
+  audience: 기획자
+  task: 회의록에서 할 일 뽑기
+  question: 회의록을 AI에게 주고 할 일 목록을 뽑는 법
+  status: 대기
+  source: "중심 - 담당자와 기한을 AI가 추측하는 문제"
+- id: planner-spec-review
+  audience: 기획자
+  task: 요구사항 문서 빈틈 찾기
+  question: 기획서 검토를 AI에게 시키면 뭘 물어봐야 하나요
+  status: 대기
+  source: "중심 - 작성이 아니라 검토를 맡기는 사례"
+- id: planner-weekly-report
+  audience: 기획자
+  task: 주간 업무 보고
+  question: 주간 보고를 AI로 쓰면 매번 다시 설명해야 해요
+  status: 대기
+  source: "중심 - 매뉴얼 빈칸이 가장 적은 사례"
+- id: sales-followup-mail
+  audience: 영업 담당자
+  task: 미팅 후 후속 메일
+  question: 미팅 메모로 후속 메일을 AI에게 쓰게 해도 되나요
+  status: 대기
+  source: "중심 - 약속하지 않은 내용이 들어가는지 확인"
+- id: sales-proposal
+  audience: 영업 담당자
+  task: 고객사 맞춤 제안서 초안
+  question: 제안서 초안을 AI로 만들 때 고객사 정보는 어디까지 넣나요
+  status: 대기
+  source: "중심 - 넘기지 않을 입력(단가, 계약 조건)"
+- id: sales-quote-reply
+  audience: 영업 담당자
+  task: 견적 문의 1차 답변
+  question: 견적 문의 답변을 AI로 빨리 쓰는 법
+  status: 대기
+  source: "중심 - 가격 확정은 맡기지 않는 일"
+- id: cs-complaint-reply
+  audience: 고객 지원 담당자
+  task: 불만 문의 답변 초안
+  question: 화난 고객에게 보내는 답변을 AI로 써도 되나요
+  status: 대기
+  source: "중심 - 보상 약속은 사람이 결정"
+- id: cs-faq-update
+  audience: 고객 지원 담당자
+  task: FAQ 갱신
+  question: 반복되는 문의로 FAQ를 AI에게 만들게 하는 법
+  status: 대기
+  source: "중심 - 문의 원문에서 개인정보 걷어내기"
+- id: cs-refund-notice
+  audience: 고객 지원 담당자
+  task: 환불·교환 안내문
+  question: 환불 규정 안내를 AI가 틀리게 쓰면 어떡하나요
+  status: 대기
+  source: "중심 - 규정 원문을 붙이고 출처를 요구하기"
